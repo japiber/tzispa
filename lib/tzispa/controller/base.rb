@@ -5,7 +5,6 @@ require 'tzispa/http/context'
 require 'tzispa/rig/template'
 
 
-
 module Tzispa
   module Controller
     class Base

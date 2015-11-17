@@ -1,7 +1,7 @@
 require 'json'
 require 'tzispa/domain'
 require 'tzispa/controller/base'
-require 'tzispa/controller/error/invalid_sign'
+require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/security'
 require 'tzispa/helpers/response'
 require 'tzispa/utils/string'
@@ -60,7 +60,7 @@ module Tzispa
       end
 
       def sign?
-        context.router_params[:sign] == Api.sign_array([
+        context.router_params[:sign] == sign_array([
            context.router_params[:handler],
            context.router_params[:verb],
            context.router_params[:predicate]

@@ -70,7 +70,7 @@ module Tzispa
 
       def api(handler, verb, predicate)
         raise ArgumentError.new('missing parameter in api call') unless handler && verb
-        sign = self.class.sign_array [handler, verb, predicate], @app.config.salt
+        sign = sign_array [handler, verb, predicate], @app.config.salt
         @app.router_path :api, {sign: sign, handler: handler, verb: verb, predicate: predicate}
       end
 

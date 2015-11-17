@@ -1,7 +1,7 @@
 require 'tzispa'
 require 'tzispa/rig'
 require 'tzispa/controller/base'
-require 'tzispa/controller/error/http_404'
+require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
 
 module Tzispa
