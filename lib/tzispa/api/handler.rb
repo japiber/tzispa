@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 
 module Tzispa
@@ -16,19 +18,20 @@ module Tzispa
       HANDLED_RESULT            = 200
 
       HANDLED_MESSAGES = {
-        HANDLED_OK                => 'La operación se ha realizado correctamente'.freeze,
-        HANDLED_MISSING_PARAMETER => 'Error: faltan parámetros para realizar la operación'.freeze,
-        HANDLED_ERROR             => 'Error indeterminado: la operación no se ha podido realizar'.freeze
+        HANDLED_OK                => 'La operación se ha realizado correctamente',
+        HANDLED_MISSING_PARAMETER => 'Error: faltan parámetros para realizar la operación',
+        HANDLED_ERROR             => 'Error indeterminado: la operación no se ha podido realizar'
       }
 
       def initialize(context)
         @context = context
       end
 
-      def result(response_verb:, status: HANDLED_UNDEFINED, data: nil)
+      def result(response_verb:, status: HANDLED_UNDEFINED, data: nil, detailed_error: nil)
         @status = status
         @response_verb = response_verb
         @data = data
+        @detailed_error = detailed_error
       end
 
       def message
@@ -52,7 +55,7 @@ module Tzispa
       end
 
       def error_message(status)
-        self.class::ERROR_MESSAGES[status] if (defined?( self.class::ERROR_MESSAGES ) && self.class::ERROR_MESSAGES.is_a?(Hash))
+        "#{self.class::ERROR_MESSAGES[status]}#{': '+@detailed_error if @detailed_error}" if (defined?( self.class::ERROR_MESSAGES ) && self.class::ERROR_MESSAGES.is_a?(Hash))
       end
 
 

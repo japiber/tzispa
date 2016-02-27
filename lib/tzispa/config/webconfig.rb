@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tzispa/config/yaml'
 
 module Tzispa
@@ -14,7 +16,7 @@ module Tzispa
       end
 
       def filename
-        @filename ||= "#{@domain.path}/#{@cfname}.yml".freeze
+        @filename ||= "#{@domain.path}/config/#{@cfname}.yml".freeze
       end
 
       def load!

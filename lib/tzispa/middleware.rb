@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'moneta'
 require 'securerandom'
 require 'rack/session/moneta'
@@ -5,17 +7,25 @@ require 'rack/session/moneta'
 module Tzispa
   class Middleware
 
+
     def initialize(app)
       @stack = []
       @application = app
     end
 
     def load!
-      @builder ||= ::Rack::Builder.new
+      @builder = ::Rack::Builder.new
       load_default_stack
       @stack.each { |m, args, block| @builder.use load_middleware(m), *args, &block }
-      @builder.run @application.router
+      @builder.run @application.class.router
       self
+    end
+
+    def map(mount_path, builder)
+      app = @application
+      builder.map mount_path do
+        run app.load!
+      end
     end
 
     def call(env)

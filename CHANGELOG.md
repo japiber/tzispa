@@ -2,8 +2,26 @@ Tzispa
 
 General purpose web framework
 
+## v0.3.3
+- Added internationalization support with i18n
+- Created new config folder in each domain to store all configurations
+- Moved webconfig.yml to the config folder
+- New routes definition in-app instead of yml config file
+- Added framework routes 'api', 'site' and 'index' in Routes class methods
+
+## v0.3.2
+- Added 'use' method in Repository to support multiple adapters in apps
+- new repository management to allow 'local' and gem repositories
+- repository dup in context to separate repository state between requests
+- log unrescued errors in base controller
+- raise custom exceptions to notify unknown models, adapters
+
+## v0.3.1
+- Moved model to entity monkey patched methods to independent module 'Entity'
+- Preload all repository model classes in application startup
+
 ## v0.3.0
-- Added new Rig template caching in Application
+- Added Rig templates caching in Application
 - Added mutex sync access to the shared repository
 
 ## v0.2.9
@@ -23,7 +41,7 @@ General purpose web framework
 - Split utilities into another gem: tzispa_utils
 
 ## v0.2.4
-- Added repository / model / entity abstraction layers
+- Added Repository / Model / Entity abstraction layers
 
 ## v0.2.0
 - Removed Lotus dependencies and implementing a mininal http core framework based on Rack

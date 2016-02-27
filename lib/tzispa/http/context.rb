@@ -8,16 +8,17 @@ require 'tzispa/helpers/security'
 
 module Tzispa
   module Http
+
     class Context
       extend Forwardable
 
       include Tzispa::Helpers::Response
       include Tzispa::Helpers::Security
 
-      attr_reader    :app, :env, :request, :response
+      attr_reader    :app, :env, :request, :response, :repository
       attr_accessor  :domain
       def_delegators :@request, :session
-      def_delegators :@app, :repository, :config
+      def_delegators :@app, :config, :logger
 
       SESSION_LAST_ACCESS   = :__last_access
       SESSION_AUTH_USER     = :__auth__user
@@ -29,6 +30,7 @@ module Tzispa
         @app = environment[:tzispa__app]
         @request = Tzispa::Http::Request.new(environment)
         @response = Tzispa::Http::Response.new
+        @repository = @app.repository.dup if @app.repository
         #set_last_access if config.sessions.enabled
       end
 
@@ -65,15 +67,16 @@ module Tzispa
       end
 
       def path(path_id, params={})
-        @app.router_path path_id, params
+        @app.class.routes.path path_id, params
       end
 
-      def api(handler, verb, predicate)
+      def api(handler, verb, predicate, sufix)
         raise ArgumentError.new('missing parameter in api call') unless handler && verb
         sign = sign_array [handler, verb, predicate], @app.config.salt
-        @app.router_path :api, {sign: sign, handler: handler, verb: verb, predicate: predicate}
+        @app.class.routes.path :api, {sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix}
       end
 
     end
+
   end
 end

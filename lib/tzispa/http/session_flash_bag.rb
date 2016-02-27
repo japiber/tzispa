@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 
 module Tzispa
@@ -5,7 +7,7 @@ module Tzispa
 
     class SessionFlashBag
 
-      
+
       extend Forwardable
 
       def_delegators :@bag, :count, :length, :size, :each

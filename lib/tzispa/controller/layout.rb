@@ -1,5 +1,6 @@
-require 'tzispa'
-require 'tzispa/rig'
+# frozen_string_literal: true
+
+require 'tzispa_rig'
 require 'tzispa/controller/base'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
@@ -11,8 +12,11 @@ module Tzispa
       include Tzispa::Helpers::Response
 
       def render!
-        layout = context.router_params[:layout] || context.config.default_layout
-        layout = context.config.default_layout if context.config.auth_required && !context.logged? && layout != context.config.default_layout
+        layout = if context.config.auth_required && !context.logged? && context.router_params[:layout]
+                   context.config.default_layout
+                 else
+                   context.router_params[:layout] || context.config.default_layout
+                 end
         layout_format = context.router_params[:format] || context.config.default_format
         rig = context.app.engine.layout(name: layout, format: layout_format.to_sym)
         response.body << rig.render(context)

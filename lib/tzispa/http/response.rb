@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 require 'rack'
 
 module Tzispa
   module Http
+
     class Response < Rack::Response
 
       DROP_BODY_RESPONSES = [204, 205, 304]
-      
+
       def initialize(*)
         super
         headers['Content-Type'] ||= 'text/html'
@@ -57,5 +60,6 @@ module Tzispa
       end
 
     end
+    
   end
 end

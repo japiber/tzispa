@@ -1,56 +1,67 @@
+# frozen_string_literal: true
+
 require 'forwardable'
+require 'logger'
+require 'i18n'
 require 'tzispa/domain'
 require 'tzispa/config/webconfig'
 require 'tzispa/config/routes'
 require 'tzispa/middleware'
-require 'tzispa/data_adapter'
-require 'tzispa/repository'
-require "tzispa/rig"
+require 'tzispa_data'
+require "tzispa_rig"
 
 
 module Tzispa
   class Application
     extend Forwardable
 
-    attr_reader :domain, :router, :config, :middleware, :adapter, :repository, :engine
+    attr_reader :domain, :config, :middleware, :repository, :engine, :logger
     def_delegator :@middleware, :use
+    def_delegator :@domain, :name
 
 
-    def self.inherited(base)
-      super
-      base.class_eval do
-        synchronize do
-          applications.add(base)
+    class << self
+
+      attr_accessor :routes
+
+      def inherited(base)
+        super
+        base.class_eval do
+          synchronize do
+            applications.add(base)
+          end
         end
       end
-    end
 
-    def self.applications
-      synchronize do
-        @@applications ||= Set.new
+      def applications
+        synchronize do
+          @@applications ||= Set.new
+        end
       end
-    end
 
-    def self.synchronize
-      Mutex.new.synchronize {
-        yield
-      }
-    end
-
-    def self.mount(builder, mount_point)
-      app = self.new mount_point
-      builder.map mount_point do
-        run app.load!
+      def synchronize
+        Mutex.new.synchronize {
+          yield
+        }
       end
+
+      def mount(mount_point, builder)
+        self.routes ||= Tzispa::Config::Routes.new(mount_point)
+        app = self.new
+        yield(routes)
+        app.middleware.map mount_point, builder
+      end
+
+      def router
+        self.routes&.router
+      end
+
     end
 
-    def initialize(name:, map_path: nil)
-      @domain = Domain.new(name: name)
-      @database ||= Hash.new
-      @repository ||= Hash.new
+    def initialize(domain_name)
+      @domain = Domain.new(name: domain_name)
       @middleware = Tzispa::Middleware.new self
-      @mutex = Mutex.new
-      @map_path = map_path
+      I18n.load_path = Dir["config/locales/*.yml"]
     end
 
     def call(env)
@@ -59,23 +70,24 @@ module Tzispa
     end
 
     def load!
-      if !@loaded
-        @mutex.synchronize {
+      unless @loaded
+        Mutex.new.synchronize {
           @config = Tzispa::Config::WebConfig.new(@domain).load!
-          @router = Tzispa::Config::Routes.new(@domain).load!
           @middleware.load!
-          @adapter = Tzispa::DataAdapter.new @config.data_adapter.to_h
-          @repository = Tzispa::Repository.new @adapter
+          @repository = Tzispa::Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
           @engine = Tzispa::Rig::Engine.new self
+          @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
+          @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
+          I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"] if @config.respond_to?(:locales) && @config.locales.preload
+          I18n.locale = @config.locales.default.to_sym if @config.respond_to?(:locales) && @config.locales.default
           @loaded = true
         }
       end
       self
     end
 
-    def router_path(path_id, params={})
-      "#{@map_path if @map_path != '/'}#{@router.path path_id, params}".freeze
-    end
+    private
+
 
   end
 end

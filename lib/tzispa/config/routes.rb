@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'http_router'
 require 'tzispa/utils/string'
@@ -6,61 +8,46 @@ module Tzispa
   module Config
     class Routes
 
-      RPG_ROUTES_FILENAME = :routes
+      CONTROLLERS_BASE = 'Tzispa::Controller'
 
-      CONTROLLERS_BASE = 'Tzispa::Controller'.freeze
+      attr_reader :router, :map_path
 
-
-      def initialize(domain, rtfile=nil)
-        @domain = domain
-        @router = nil
-        @rttime = nil
-        @rtfile = rtfile.nil? ? RPG_ROUTES_FILENAME : rtfile
+      def initialize(map_path=nil)
+        @router = HttpRouter.new
+        @map_path = map_path unless map_path=='/'
       end
 
-      def filename
-        @filename ||= "#{@domain.path}/#{@rtfile}.yml".freeze
+      def path(path_id, params={})
+        "#{@map_path}#{@router.path path_id, params}"
       end
 
-      def load!
-        if @rttime.nil?
-          @rttime = File.ctime(filename)
+      def add(route_id, path, controller)
+        spec_control, callmethod = controller.to_s.split(':')
+        mpath = spec_control.split('#')
+        controller = TzString.camelize(mpath.pop).to_s
+        if mpath.count > 1
+          controller_module = mpath.collect!{ |w| w.capitalize }.join('::')
+          require_relative "./controller/#{controller.downcase}"
         else
-          if @rttime != File.ctime(filename)
-            @router = nil
-            @rttime = File.ctime(filename)
-          end
+          controller_module = CONTROLLERS_BASE
+          require "tzispa/controller/#{controller.downcase}"
         end
-        @router ||= Routes.parse(filename, @domain)
+        @router.add(path).tap { |rule|
+          rule.to TzString.constantize("#{controller_module}::#{controller}").new(callmethod)
+          rule.name = route_id
+        }
       end
 
-      private
-
-      def self.synchronize
-        Mutex.new.synchronize do
-          yield
-        end
+      def index(path, controller=nil)
+        add :index, path, controller || 'layout:render!'
       end
 
-      def self.parse(filename, domain)
-        synchronize do
-          router = HttpRouter.new
-          YAML.load(File.open(filename)).each { |key,value|
-            spec_control, callmethod = value['controller'].to_s.split(':')
-            mpath = spec_control.split('#')
-            controller = TzString.camelize(mpath.pop).to_s
-            if mpath.count > 1
-              controller_module = mpath.collect!{ |w| w.capitalize }.join('::')
-              require_relative "./controller/#{controller.downcase}"
-            else
-              controller_module = CONTROLLERS_BASE
-              require "tzispa/controller/#{controller.downcase}"
-            end
-            rin = router.add(value['path']).to TzString.constantize("#{controller_module}::#{controller}").new(callmethod)
-            rin.name = key.to_sym
-          }
-          router
-        end
+      def api(path, controller=nil)
+        add :api, path, controller || 'api:dispatch!'
+      end
+
+      def site(path, controller=nil)
+        add :site, path, controller || 'layout:render!'
       end
 
     end

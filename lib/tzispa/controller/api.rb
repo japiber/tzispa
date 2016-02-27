@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'tzispa/domain'
 require 'tzispa/controller/base'
@@ -20,43 +22,55 @@ module Tzispa
         @domain = domain_name.nil? ? context.app.domain : Tzispa::Domain.new(name: domain_name)
         @verb = context.router_params[:verb]
         @predicate = context.router_params[:predicate]
-        hnd = handler_class.new(context)
+        @hnd = handler_class.new(context)
         @predicate ? hnd.send(@verb, @predicate) : hnd.send(@verb)
-        context.flash << hnd.message
-        send hnd.response_verb, hnd.data
+        send hnd.response_verb
         response.finish
       end
 
-      def redirect(url)
+      def redirect
+        context.flash << hnd.message
+        url = hnd.data
         context.redirect url, response
       end
 
-      def html(body)
-        response.body << body
+      def html
+        context.flash << hnd.message
+        response.body << hnd.data
+        content_type :htm
         set_action_headers
       end
 
-      def json(body)
-        response.body << body
+      def json
+        data = hnd.data.is_a?(::Hash) ? hnd.data : JSON.parse(hnd.data)
+        data[:__result_status] = hnd.status
+        data[:__result_message] = hnd.message
+        response.body << data.to_json.to_s
         content_type :json
         set_action_headers
       end
 
-      def text(body)
-        response.body << body
+      def text
+        context.flash << hnd.message
+        response.body << hnd.data
         content_type :text
         set_action_headers
       end
 
-      def download(data)
-        path = "#{Dir.pwd}/#{data[:path]}".freeze
+      def download
+        context.flash << hnd.message
+        data = hnd.data
+        path = "#{Dir.pwd}/#{data[:path]}"
         send_file path, data
       end
 
       private
 
+      attr_reader :hnd
+
       def set_action_headers
-        response['X-API'] = "#{context.router_params[:sign]}:#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}".freeze
+        response['X-API'] = "#{context.router_params[:sign]}:#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}"
+        response['X-API-STATE'] = "#{hnd.status}"
       end
 
       def sign?
@@ -69,7 +83,7 @@ module Tzispa
       end
 
       def handler_class_name
-        "#{TzString.camelize @domain.name }::Api::#{TzString.camelize @handler }Handler".freeze
+        "#{TzString.camelize @domain.name }::Api::#{TzString.camelize @handler }Handler"
       end
 
       def handler_class
