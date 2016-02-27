@@ -7,13 +7,12 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Juan Antonio Piñero']
   s.email       = ['japinero@area-integral.com']
-  s.homepage    = 'https://www.area-integral.com'
+  s.homepage    = 'https://github.com/japiber/tzispa'
   s.summary     = 'A sparkling web framework'
   s.description = 'A sparkling web framework based on Rack and inspired by Sinatra and Lotus'
   s.licenses    = ['MIT']
 
-  s.required_rubygems_version = '~> 2.0'
-  s.required_ruby_version     = '~> 2.0'
+  s.required_ruby_version     = '~> 2.3'
 
   s.add_dependency 'rack',           '~> 1.5'
   s.add_dependency 'http_router',    '~> 0.11'
