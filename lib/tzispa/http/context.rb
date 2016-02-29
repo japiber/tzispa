@@ -1,5 +1,5 @@
 require 'forwardable'
-require 'time'
+require 'tzispa/context'
 require 'tzispa/http/response'
 require 'tzispa/http/request'
 require 'tzispa/http/session_flash_bag'
@@ -9,16 +9,14 @@ require 'tzispa/helpers/security'
 module Tzispa
   module Http
 
-    class Context
+    class Context < Tzispa::Context
       extend Forwardable
 
       include Tzispa::Helpers::Response
       include Tzispa::Helpers::Security
 
-      attr_reader    :app, :env, :request, :response, :repository
-      attr_accessor  :domain
+      attr_reader    :request, :response
       def_delegators :@request, :session
-      def_delegators :@app, :config, :logger
 
       SESSION_LAST_ACCESS   = :__last_access
       SESSION_AUTH_USER     = :__auth__user
@@ -26,12 +24,9 @@ module Tzispa
 
 
       def initialize(environment)
-        @env = environment
-        @app = environment[:tzispa__app]
+        super(environment)
         @request = Tzispa::Http::Request.new(environment)
         @response = Tzispa::Http::Response.new
-        @repository = @app.repository.dup if @app.repository
-        #set_last_access if config.sessions.enabled
       end
 
       def router_params
