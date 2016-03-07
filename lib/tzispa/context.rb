@@ -2,7 +2,7 @@ require 'forwardable'
 
 module Tzispa
 
-  # Thie class defines a environment to hold application state in runtime
+  # This class defines a environment to hold application state in runtime
   class Context
     extend Forwardable
 

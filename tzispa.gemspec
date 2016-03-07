@@ -5,6 +5,7 @@ Gem::Specification.new do |s|
   s.name        = Tzispa::FRAMEWORK_NAME.downcase
   s.version     = Tzispa::VERSION
   s.platform    = Gem::Platform::RUBY
+  s.bindir      = 'bin'
   s.authors     = ['Juan Antonio Piñero']
   s.email       = ['japinero@area-integral.com']
   s.homepage    = 'https://github.com/japiber/tzispa'
@@ -23,5 +24,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'tzispa_data',    '~> 0.1'
 
   s.files         = Dir.glob("{lib}/**/*") + %w(README.md CHANGELOG.md)
+  s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ['lib']
 end
