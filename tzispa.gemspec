@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'tzispa_rig',     '~> 0.2.0'
   s.add_dependency 'tzispa_data',    '~> 0.1'
 
-  s.files         = Dir.glob("{lib}/**/*") + %w(README.md CHANGELOG.md)
+  s.files         = Dir.glob("{lib,bin}/**/*") + %w(README.md CHANGELOG.md LICENSE tzispa.gemspec)
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ['lib']
 end

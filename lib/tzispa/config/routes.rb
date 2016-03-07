@@ -21,7 +21,7 @@ module Tzispa
         "#{@map_path}#{@router.path path_id, params}"
       end
 
-      def add(route_id, path, controller)
+      def add(route_id, path, controller, methods)
         spec_control, callmethod = controller.to_s.split(':')
         mpath = spec_control.split('#')
         controller = TzString.camelize(mpath.pop).to_s
@@ -32,22 +32,22 @@ module Tzispa
           controller_module = CONTROLLERS_BASE
           require "tzispa/controller/#{controller.downcase}"
         end
-        @router.add(path).tap { |rule|
+        @router.add(path, {request_method: methods}).tap { |rule|
           rule.to TzString.constantize("#{controller_module}::#{controller}").new(callmethod)
           rule.name = route_id
         }
       end
 
-      def index(path, controller=nil)
-        add :index, path, controller || 'layout:render!'
+      def index(path, methods, controller=nil)
+        add :index, path, controller || 'layout:render!', methods
       end
 
-      def api(path, controller=nil)
-        add :api, path, controller || 'api:dispatch!'
+      def api(path, methods, controller=nil)
+        add :api, path, controller || 'api:dispatch!', methods
       end
 
-      def site(path, controller=nil)
-        add :site, path, controller || 'layout:render!'
+      def site(path, methods, controller=nil)
+        get :site, path, controller || 'layout:render!', methods
       end
 
     end
