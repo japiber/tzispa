@@ -47,7 +47,7 @@ module Tzispa
       end
 
       def site(path, methods, controller=nil)
-        get :site, path, controller || 'layout:render!', methods
+        add :site, path, controller || 'layout:render!', methods
       end
 
     end

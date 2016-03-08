@@ -16,6 +16,7 @@ module Tzispa
       include Tzispa::Helpers::Security
 
       attr_reader    :request, :response
+      attr_accessor  :layout
       def_delegators :@request, :session
 
       SESSION_LAST_ACCESS   = :__last_access
