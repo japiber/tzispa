@@ -6,7 +6,7 @@ module Tzispa
     attr_reader :name, :root
 
     DEFAULT_DOMAIN_NAME   = :default
-    DEFAULT_DOMAINS_ROOT  = :domains
+    DEFAULT_DOMAINS_ROOT  = :apps
 
 
     def initialize(name: DEFAULT_DOMAIN_NAME, root: DEFAULT_DOMAINS_ROOT)

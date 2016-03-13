@@ -16,10 +16,11 @@ Gem::Specification.new do |s|
   s.required_ruby_version     = '~> 2.3'
 
   s.add_dependency 'rack',           '~> 1.5'
+  s.add_dependency 'i18n',           '~> 0.7'
   s.add_dependency 'http_router',    '~> 0.11'
   s.add_dependency 'moneta',         '~> 0.8'
   s.add_dependency 'tzispa_helpers', '~> 0.1.0'
-  s.add_dependency 'tzispa_utils',   '~> 0.1.2'
+  s.add_dependency 'tzispa_utils',   '~> 0.2.0'
   s.add_dependency 'tzispa_rig',     '~> 0.2.0'
   s.add_dependency 'tzispa_data',    '~> 0.1'
 
