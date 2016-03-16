@@ -4,7 +4,7 @@ require 'forwardable'
 require 'logger'
 require 'i18n'
 require 'tzispa/domain'
-require 'tzispa/config/webconfig'
+require 'tzispa/config/appconfig'
 require 'tzispa/config/routes'
 require 'tzispa/middleware'
 require 'tzispa_data'
@@ -46,10 +46,11 @@ module Tzispa
       end
 
       def mount(mount_point, builder)
-        self.routes ||= Tzispa::Config::Routes.new(mount_point)
-        app = self.new
-        yield(routes)
-        app.middleware.map mount_point, builder
+        self.new.tap { |app|
+          self.routes ||= Tzispa::Config::Routes.new(mount_point)
+          yield(routes)
+          app.middleware.map mount_point, builder
+        }
       end
 
       def router
@@ -62,6 +63,7 @@ module Tzispa
       @domain = Domain.new(name: domain_name)
       @middleware = Tzispa::Middleware.new self
       I18n.load_path = Dir["config/locales/*.yml"]
+      @config = Tzispa::Config::AppConfig.new(@domain).load!
     end
 
     def call(env)
@@ -72,7 +74,6 @@ module Tzispa
     def load!
       unless @loaded
         Mutex.new.synchronize {
-          @config = Tzispa::Config::WebConfig.new(@domain).load!
           @middleware.load!
           @repository = Tzispa::Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
           @engine = Tzispa::Rig::Engine.new self
