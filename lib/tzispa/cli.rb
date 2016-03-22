@@ -1,6 +1,7 @@
 require 'thor'
 require 'tzispa/command_cli/project'
 require 'tzispa/command_cli/app'
+require 'tzispa/command_cli/rig'
 
 module Tzispa
 
@@ -25,6 +26,15 @@ module Tzispa
       CommandCli::App.new(name).create(options[:host], options[:mount])
       puts "created new app #{name}"
     end
+
+    desc 'rig', 'Generate new rig template'
+    method_option :app, :aliases => "-a", :desc => "The app where the new template will be created", :required => true
+    method_option :type, :aliases => "-t", :desc => "The template type: block, static or layout ", :required => true
+    def rig(name)
+      CommandCli::Rig.new(name, options[:app], options[:type]).create
+      puts "created new #{options[:type]} rig '#{name}' in #{options[:app]}"
+    end
+
 
   end
 

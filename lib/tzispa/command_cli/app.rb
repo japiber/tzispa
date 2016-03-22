@@ -15,7 +15,7 @@ module Tzispa
         'config/locales',
         'error',
         'rig',
-        'rig/blk',
+        'rig/block',
         'rig/layout',
         'rig/static'
       ]
@@ -27,7 +27,6 @@ module Tzispa
       end
 
       def create(host, mount_path=nil)
-        raise "This command must be runned in a Tzispa project base dir" unless Tzispa::CommandCli::Project.check?
         update_project
         create_class mount_path
         create_structure

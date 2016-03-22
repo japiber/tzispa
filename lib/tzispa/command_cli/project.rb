@@ -49,6 +49,7 @@ module Tzispa
       end
 
       def self.open
+        raise "This command must be runned in a Tzispa project base dir" unless self.check?
         hpj = JSON.parse String.new.tap { |ptxt|
           File.open("#{PROJECT_FILE}","r") do |f|
             while line = f.gets
