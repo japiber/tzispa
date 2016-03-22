@@ -11,6 +11,12 @@ module Tzispa
         self.parametrize params
       end
 
+      def self.save(cfg, filename)
+        File.open(filename, 'w') { |f|
+           f.write cfg.to_yaml
+        }        
+      end
+
 
 
     end

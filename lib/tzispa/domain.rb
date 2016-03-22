@@ -9,9 +9,9 @@ module Tzispa
     DEFAULT_DOMAINS_ROOT  = :apps
 
 
-    def initialize(name: DEFAULT_DOMAIN_NAME, root: DEFAULT_DOMAINS_ROOT)
-      @name = name || DEFAULT_DOMAIN_NAME
-      @root = root || DEFAULT_DOMAINS_ROOT
+    def initialize(name=DEFAULT_DOMAIN_NAME, root=DEFAULT_DOMAINS_ROOT)
+      @name = name
+      @root = root
     end
 
     def path

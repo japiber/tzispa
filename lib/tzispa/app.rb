@@ -47,7 +47,7 @@ module Tzispa
 
       def mount(mount_point, builder)
         self.new.tap { |app|
-          self.routes ||= Tzispa::Config::Routes.new(mount_point)
+          self.routes ||= Config::Routes.new(mount_point)
           yield(routes)
           app.middleware.map mount_point, builder
         }
@@ -60,10 +60,10 @@ module Tzispa
     end
 
     def initialize(domain_name)
-      @domain = Domain.new(name: domain_name)
-      @middleware = Tzispa::Middleware.new self
+      @domain = Domain.new(domain_name)
+      @middleware = Middleware.new self
       I18n.load_path = Dir["config/locales/*.yml"]
-      @config = Tzispa::Config::AppConfig.new(@domain).load!
+      @config = Config::AppConfig.new(@domain).load!
     end
 
     def call(env)
@@ -75,8 +75,8 @@ module Tzispa
       unless @loaded
         Mutex.new.synchronize {
           @middleware.load!
-          @repository = Tzispa::Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
-          @engine = Tzispa::Rig::Engine.new self
+          @repository = Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
+          @engine = Rig::Engine.new self
           @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
           @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
           I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"] if @config.respond_to?(:locales) && @config.locales.preload
