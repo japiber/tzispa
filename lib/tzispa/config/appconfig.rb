@@ -37,25 +37,26 @@ module Tzispa
 
       def create_default(host:, layout: 'index', dev_mode: true, locale: 'en')
         hcfg = Hash.new.tap { |cfg|
-          cfg[:id] = domain.name
-          cfg[:default_layout] = layout
-          cfg[:default_format] = 'htm'
-          cfg[:host_name] = host
-          cfg[:dev_mode] = dev_mode
-          cfg[:default_encoding] = 'utf-8'
-          cfg[:auth_required] = false
-          cfg[:salt] = secret(24)
-          cfg[:locales] = Hash.new.tap { |loc|
-            loc[:preload] = true
-            loc[:default] = locale
+          cfg['id'] = domain.name
+          cfg['default_layout'] = layout
+          cfg['default_format'] = 'htm'
+          cfg['host_name'] = host
+          cfg['dev_mode'] = dev_mode
+          cfg['default_encoding'] = 'utf-8'
+          cfg['auth_required'] = false
+          cfg['salt'] = secret(24)
+          cfg['locales'] = Hash.new.tap { |loc|
+            loc['preload'] = true
+            loc['default'] = locale
           }
-          cfg[:sessions] = Hash.new.tap { |ses|
-            ses[:enabled] = true
-            ses[:timeout] = 3600
-            ses[:secret] = secret(32)
+          cfg['sessions'] = Hash.new.tap { |ses|
+            ses['enabled'] = true
+            ses['timeout'] = 3600
+            ses['secret'] = secret(32)
           }
         }
         Tzispa::Config::Yaml.save(hcfg, filename)
+        load!
       end
 
 

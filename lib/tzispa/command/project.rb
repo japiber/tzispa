@@ -2,7 +2,7 @@ require 'json'
 require "base64"
 
 module Tzispa
-  module CommandCli
+  module Command
 
     class Project
 
@@ -35,7 +35,8 @@ module Tzispa
         @apps = Array.new
       end
 
-      def create
+
+      def generate
         if create_structure
           create_project
           create_start

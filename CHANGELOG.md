@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.0
+- Added basic cli command engine
+- Added some documentation in README.md
+
 ## v0.3.3
 - Added internationalization support with i18n
 - Created new config folder in each domain to store all configurations
