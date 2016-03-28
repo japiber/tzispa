@@ -13,7 +13,6 @@ module Tzispa
     require 'tzispa/command/cli/generate'
     register Tzispa::Command::Cli::Generate, 'generate', 'generate [SUBCOMMAND]', 'Generate Tzispa components'
 
-
   end
 
 end

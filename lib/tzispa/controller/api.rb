@@ -64,6 +64,44 @@ module Tzispa
         send_file path, data
       end
 
+      def generate_handler(domain, name)
+        @domain = domain
+        @handler = name
+        raise "The handler '#{name}' already exist" if File.exist?(handler_class_file)
+        File.open(handler_class_file, "w") { |f|
+          hnd_code = TzString.new
+          f.puts hnd_code.indenter("require 'tzispa/api/handler'\n\n")
+          level = 0
+          handler_namespace.split('::').each { |ns|
+            f.puts hnd_code.indenter("module #{ns}\n", level > 0 ? 2 : 0).to_s
+            level += 1
+          }
+          f.puts hnd_code.indenter("\nclass #{handler_class_name} < Tzispa::Api::Handler\n\n", 2)
+          f.puts hnd_code.indenter("end\n\n")
+          handler_namespace.split('::').each { |ns|
+            f.puts hnd_code.unindenter("end\n", 2)
+          }
+        }
+      end
+
+      def handler_class_name
+        "#{TzString.camelize @handler}Handler"
+      end
+
+      def handler_class_file
+        "#{@domain.path}/api/#{@handler}.rb"
+      end
+
+      def handler_namespace
+        "#{TzString.camelize @domain.name }::Api"
+      end
+
+      def handler_class
+        @domain.require "api/#{@handler}"
+        TzString.constantize "#{handler_namespace}::#{handler_class_name}"
+      end
+
+
       private
 
       attr_reader :hnd
@@ -80,15 +118,6 @@ module Tzispa
            context.router_params[:predicate]
           ],
           context.app.config.salt)
-      end
-
-      def handler_class_name
-        "#{TzString.camelize @domain.name }::Api::#{TzString.camelize @handler }Handler"
-      end
-
-      def handler_class
-        @domain.require "api/#{@handler.downcase}"
-        TzString.constantize handler_class_name
       end
 
     end

@@ -16,13 +16,13 @@ module Tzispa
       attr_reader :context
       def_delegators :@context, :request, :response, :config
 
-      def initialize(callmethod)
+      def initialize(callmethod=nil)
         @callmethod = callmethod
       end
 
       def call(environment)
         @context = Tzispa::Http::Context.new(environment)
-        invoke @callmethod
+        invoke @callmethod if @callmethod
         response.finish
       end
 
