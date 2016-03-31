@@ -1,6 +1,7 @@
 require 'json'
 require 'tzispa/domain'
 require 'tzispa/utils/string'
+require 'tzispa/utils/indenter'
 require 'tzispa/config/appconfig'
 require_relative 'project'
 
@@ -44,22 +45,28 @@ module Tzispa
       end
 
       def create_class(mount_path=nil)
-        appclass = "#{TzString.camelize domain.name}App"
         mount_path ||= DEFAULT_MOUNT_PATH
-        class_code = TzString.new
         File.open("#{Project::START_FILE}","a") do |f|
-          f.puts class_code.indenter("\nclass #{appclass} < Tzispa::Application\n\n")
-          f.puts class_code.indenter("def initialize", 2)
-          f.puts class_code.indenter("super(:#{domain.name})", 2)
-          f.puts class_code.unindenter("end\n\n", 2)
-          f.puts class_code.unindenter("end\n\n", 2)
-          f.puts class_code.indenter("#{appclass}.mount '/#{mount_path}', self do |route|")
-          f.puts class_code.indenter("route.index '/', [:get, :head]", 2)
-          f.puts class_code.indenter("route.api   '/__api_:sign/:handler/:verb(~:predicate)(/:sufix)', [:get, :head, :post]")
-          f.puts class_code.indenter("route.site  '/:title(/@:id0)(@:id1)(@~:id2)(@@:id3)(@@~:id4)(@@@:id5)/:layout.:format', [:get, :head]")
-          f.puts class_code.unindenter("end\n\n", 2)
+          f.puts new_app_code(mount_path)
         end
       end
+
+      def new_app_code(mount_path)
+        appclass = "#{TzString.camelize domain.name}App"
+        Tzispa::Utils::Indenter.new(2).tap { |code|
+          code << "\nclass #{appclass} < Tzispa::Application\n\n"
+          code.indent << "def initialize\n"
+          code.indent << "super(:#{domain.name})\n"
+          code.unindent << "end\n\n"
+          code.unindent << "end\n\n"
+          code << "#{appclass}.mount '/#{mount_path}', self do |route|\n"
+          code.indent << "route.index '/', [:get, :head]\n"
+          code << "route.api   '/__api_:sign/:handler/:verb(~:predicate)(/:sufix)', [:get, :head, :post]\n"
+          code << "route.site  '/:title(/@:id0)(@:id1)(@~:id2)(@@:id3)(@@~:id4)(@@@:id5)/:layout.:format', [:get, :head]\n"
+          code.unindent << "end\n\n"
+        }.to_s
+      end
+
 
       def create_structure
         unless File.exist? domain.path
