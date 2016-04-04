@@ -66,6 +66,10 @@ module Tzispa
         @app.class.routes.path path_id, params
       end
 
+      def url(path_id, params={})
+        @app.config.canoninal_url + @app.class.routes.path path_id, params
+      end
+
       def api(handler, verb, predicate, sufix)
         raise ArgumentError.new('missing parameter in api call') unless handler && verb
         sign = sign_array [handler, verb, predicate], @app.config.salt

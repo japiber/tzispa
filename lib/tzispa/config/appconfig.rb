@@ -41,6 +41,7 @@ module Tzispa
           cfg['default_layout'] = layout
           cfg['default_format'] = 'htm'
           cfg['host_name'] = host
+          cfg['canoninal_url'] = "http://#{host}"
           cfg['dev_mode'] = dev_mode
           cfg['default_encoding'] = 'utf-8'
           cfg['auth_required'] = false

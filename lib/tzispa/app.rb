@@ -76,7 +76,7 @@ module Tzispa
         Mutex.new.synchronize {
           @middleware.load!
           @repository = Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
-          @engine = Rig::Engine.new self
+          @engine = Rig::Engine.new(self, true, 32)
           @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
           @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
           I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"] if @config.respond_to?(:locales) && @config.locales.preload
