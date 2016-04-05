@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'moneta',         '~> 0.8'
   s.add_dependency 'tzispa_helpers', '~> 0.1.0'
   s.add_dependency 'tzispa_utils',   '~> 0.2.1'
-  s.add_dependency 'tzispa_rig',     '~> 0.2.0'
+  s.add_dependency 'tzispa_rig',     '~> 0.2.7'
   s.add_dependency 'tzispa_data',    '~> 0.1'
 
   s.files         = Dir.glob("{lib,bin}/**/*") + %w(README.md CHANGELOG.md LICENSE tzispa.gemspec)

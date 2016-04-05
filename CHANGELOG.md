@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.1
+- Add support to generate canonical urls 
+
 ## v0.4.0
 - Added basic cli command engine
 - Added some documentation in README.md
