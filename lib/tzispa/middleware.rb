@@ -57,8 +57,8 @@ module Tzispa
     def _load_session_middleware
       if @application.config.sessions.enabled
         use Rack::Session::Moneta,
-          store: Moneta.new(:HashFile, dir: './data/session', expires: true, threadsafe: true),
-          key: "_#{@application.config.id}__", ##{SecureRandom.hex(18)}
+          store: Moneta.new(:HashFile, dir: @application.config.sessions.store_path, expires: true, threadsafe: true),
+          key: "_#{@application.config.id}__",
           domain: @application.config.host_name,
           path: '/',
           expire_after: @application.config.sessions.timeout,

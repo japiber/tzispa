@@ -28,6 +28,7 @@ module Tzispa
         super(environment)
         @request = Tzispa::Http::Request.new(environment)
         @response = Tzispa::Http::Response.new
+        session[:id] ||= SecureRandom.uuid if app.config.sessions.enabled
       end
 
       def router_params
@@ -63,17 +64,17 @@ module Tzispa
       end
 
       def path(path_id, params={})
-        @app.class.routes.path path_id, params
+        app.class.routes.path path_id, params
       end
 
       def canonical_url(path_id, params={})
-        @app.config.canonical_url + path(path_id, params)
+        app.config.canonical_url + path(path_id, params)
       end
 
       def api(handler, verb, predicate, sufix)
         raise ArgumentError.new('missing parameter in api call') unless handler && verb
-        sign = sign_array [handler, verb, predicate], @app.config.salt
-        @app.class.routes.path :api, {sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix}
+        sign = sign_array [handler, verb, predicate], app.config.salt
+        app.class.routes.path :api, {sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix}
       end
 
     end

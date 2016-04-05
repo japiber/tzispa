@@ -53,6 +53,7 @@ module Tzispa
           cfg['sessions'] = Hash.new.tap { |ses|
             ses['enabled'] = true
             ses['timeout'] = 3600
+            ses['store_path'] = 'data/session'
             ses['secret'] = secret(32)
           }
         }
