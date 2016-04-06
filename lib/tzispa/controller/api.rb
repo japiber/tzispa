@@ -30,7 +30,7 @@ module Tzispa
 
       def redirect
         context.flash << hnd.message
-        url = hnd.data
+        url = hnd.data || request.referer
         context.redirect url, response
       end
 

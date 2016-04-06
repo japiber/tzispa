@@ -81,6 +81,8 @@ module Tzispa
           @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
           I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"] if @config.respond_to?(:locales) && @config.locales.preload
           I18n.locale = @config.locales.default.to_sym if @config.respond_to?(:locales) && @config.locales.default
+          @domain.require_dir 'helpers'
+          @domain.require_dir 'api'
           @loaded = true
         }
       end

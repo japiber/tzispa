@@ -15,6 +15,7 @@ module Tzispa
         'config',
         'config/locales',
         'error',
+        'helpers',
         'rig',
         'rig/block',
         'rig/layout',
@@ -37,6 +38,10 @@ module Tzispa
 
       private
 
+      def app_class_name
+        @app_class_name ||= "#{TzString.camelize domain.name}App"
+      end
+
       def update_project
         prj = Project.open
         raise "Application '#{domain.name}' already exist in this project" if prj.apps.include?(domain.name)
@@ -52,14 +57,13 @@ module Tzispa
       end
 
       def new_app_code(mount_path)
-        appclass = "#{TzString.camelize domain.name}App"
         Tzispa::Utils::Indenter.new(2).tap { |code|
-          code << "\nclass #{appclass} < Tzispa::Application\n\n"
+          code << "\nclass #{app_class_name} < Tzispa::Application\n\n"
           code.indent << "def initialize\n"
           code.indent << "super(:#{domain.name})\n"
           code.unindent << "end\n\n"
           code.unindent << "end\n\n"
-          code << "#{appclass}.mount '/#{mount_path}', self do |route|\n"
+          code << "#{app_class_name}.mount '/#{mount_path}', self do |route|\n"
           code.indent << "route.index '/', [:get, :head]\n"
           code << "route.api   '/__api_:sign/:handler/:verb(~:predicate)(/:sufix)', [:get, :head, :post]\n"
           code << "route.site  '/:title(/@:id0)(@:id1)(@~:id2)(@@:id3)(@@~:id4)(@@@:id5)/:layout.:format', [:get, :head]\n"

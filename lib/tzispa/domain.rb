@@ -22,8 +22,22 @@ module Tzispa
       Kernel.require "./#{path}/#{file}"
     end
 
+    def require_dir(dir)
+      Dir["./#{path}/#{dir}/*.rb"].each { |file|
+        name = file.split('/').last.split('.').first
+        Kernel.require "./#{path}/#{dir}/#{name}"
+      }
+    end
+
     def load(file)
       Kernel.load "./#{path}/#{file}.rb"
+    end
+
+    def load_dir(dir)
+      Dir["./#{path}/#{dir}/*.rb"].each { |file|
+        name = file.split('/').last
+        Kernel.load "./#{path}/#{dir}/#{name}"
+      }
     end
 
     def self.require(domain, file)
