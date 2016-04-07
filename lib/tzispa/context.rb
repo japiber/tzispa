@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'i18n'
 
 module Tzispa
 
@@ -13,6 +14,7 @@ module Tzispa
       @env = environment
       @app = environment[:tzispa__app]
       @repository = @app.repository.dup if @app.repository
+      I18n.locale = config.locales.default.to_sym if config.respond_to?(:locales)
     end
 
   end

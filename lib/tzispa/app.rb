@@ -62,7 +62,6 @@ module Tzispa
     def initialize(domain_name)
       @domain = Domain.new(domain_name)
       @middleware = Middleware.new self
-      I18n.load_path = Dir["config/locales/*.yml"]
       @config = Config::AppConfig.new(@domain).load!
     end
 
@@ -74,13 +73,12 @@ module Tzispa
     def load!
       unless @loaded
         Mutex.new.synchronize {
+          load_locales
           @middleware.load!
           @repository = Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
           @engine = Rig::Engine.new(self, true, 32)
           @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
           @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
-          I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"] if @config.respond_to?(:locales) && @config.locales.preload
-          I18n.locale = @config.locales.default.to_sym if @config.respond_to?(:locales) && @config.locales.default
           @domain.require_dir 'helpers'
           @domain.require_dir 'api'
           @loaded = true
@@ -90,6 +88,13 @@ module Tzispa
     end
 
     private
+
+    def load_locales
+      if @config.respond_to?(:locales)
+        I18n.load_path = Dir["config/locales/*.yml"]
+        I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"]
+      end
+    end
 
 
   end
