@@ -2,7 +2,7 @@ Tzispa
 
 General purpose web framework
 
-## v0.4.3
+## v0.4.4
 - Add new template_cache config parameter
 
 ## v0.4.2
