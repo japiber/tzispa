@@ -2,8 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.3
+- Add new template_cache config parameter
+
 ## v0.4.2
-- Preload api and helper modules an classes in app.load
+- Preload api and helper modules and classes in app.load
 
 ## v0.4.1
 - Add support to generate canonical urls

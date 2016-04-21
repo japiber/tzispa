@@ -76,7 +76,7 @@ module Tzispa
           load_locales
           @middleware.load!
           @repository = Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
-          @engine = Rig::Engine.new(self, true, 32)
+          @engine = Rig::Engine.new(self, @config.template_cache.enabled, @config.template_cache.size)
           @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
           @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
           @domain.require_dir 'helpers'
