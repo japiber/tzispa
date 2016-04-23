@@ -4,14 +4,15 @@ require 'forwardable'
 require 'logger'
 require 'i18n'
 require 'tzispa/domain'
+require 'tzispa/routes'
 require 'tzispa/config/appconfig'
-require 'tzispa/config/routes'
 require 'tzispa/middleware'
 require 'tzispa_data'
 require "tzispa_rig"
 
 
 module Tzispa
+
   class Application
     extend Forwardable
 
@@ -47,7 +48,7 @@ module Tzispa
 
       def mount(mount_point, builder)
         self.new.tap { |app|
-          self.routes ||= Config::Routes.new(mount_point)
+          self.routes ||= Routes.new(mount_point)
           yield(routes)
           app.middleware.map mount_point, builder
         }
@@ -95,7 +96,6 @@ module Tzispa
         I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"]
       end
     end
-
 
   end
 end

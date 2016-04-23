@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'moneta'
-require 'securerandom'
 require 'rack/session/moneta'
 
 module Tzispa
@@ -36,6 +35,8 @@ module Tzispa
       @stack.unshift [middleware, args, blk]
     end
 
+    private
+
     def load_middleware(middleware)
       case middleware
       when String
@@ -48,7 +49,7 @@ module Tzispa
     def load_default_stack
       @default_stack_loaded ||= begin
         _load_session_middleware
-        _load_asset_middlewares
+        _load_assets_middleware
         use Rack::MethodOverride
         true
       end
@@ -66,7 +67,7 @@ module Tzispa
       end
     end
 
-    def _load_asset_middlewares
+    def _load_assets_middleware
       use Rack::Static,
         :urls => ["/img", "/js", "/css", "/*.ico"],
         :root => "public",

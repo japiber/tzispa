@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require 'ostruct'
 require 'tzispa/version'
 require 'tzispa/http/context'
 require 'tzispa/rig/template'
