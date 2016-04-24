@@ -12,14 +12,8 @@ module Tzispa
       include Tzispa::Helpers::Response
 
       def render!
-        layout = if context.config.auth_required && !context.logged? && context.router_params[:layout]
-                   context.config.default_layout
-                 else
-                   context.router_params[:layout] || context.config.default_layout
-                 end
         layout_format = context.router_params[:format] || context.config.default_format
-        context.layout = layout
-        rig = context.app.engine.layout(name: layout, format: layout_format.to_sym)
+        rig = context.app.engine.layout(name: context.layout, format: layout_format.to_sym)
         response.body << rig.render(context)
         content_type layout_format
         set_layout_headers

@@ -2,7 +2,6 @@
 
 require 'forwardable'
 require 'tzispa/version'
-require 'tzispa/http/context'
 require 'tzispa/rig/template'
 
 
@@ -20,7 +19,7 @@ module Tzispa
       end
 
       def call(environment)
-        @context = Tzispa::Http::Context.new(environment)
+        @context = environment[Tzispa::ENV_TZISPA_CONTEXT]
         invoke @callmethod if @callmethod
         response.finish
       end
@@ -66,7 +65,7 @@ module Tzispa
 
       def error_page(status)
         begin
-          error_file = "#{@app.domain.path}/error/#{status}.htm"
+          error_file = "#{context.app.domain.path}/error/#{status}.htm"
           response.body = Tzispa::Rig::File.new(error_file).load!.content
         rescue
           response.body = String.new('<!DOCTYPE html>')

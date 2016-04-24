@@ -16,7 +16,6 @@ module Tzispa
       include Tzispa::Helpers::Security
 
       attr_reader    :request, :response
-      attr_accessor  :layout
       def_delegators :@request, :session
 
       SESSION_LAST_ACCESS   = :__last_access
@@ -32,7 +31,15 @@ module Tzispa
       end
 
       def router_params
-        @env['router.params']
+        env['router.params']
+      end
+
+      def layout
+        if config.auth_required && !logged? && router_params[:layout]
+          config.default_layout
+        else
+          router_params[:layout] || config.default_layout
+        end
       end
 
       def set_last_access

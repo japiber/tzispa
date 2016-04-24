@@ -7,6 +7,7 @@ require 'tzispa/domain'
 require 'tzispa/routes'
 require 'tzispa/config/appconfig'
 require 'tzispa/middleware'
+require 'tzispa/http/context'
 require 'tzispa_data'
 require "tzispa_rig"
 
@@ -67,7 +68,8 @@ module Tzispa
     end
 
     def call(env)
-      env[:tzispa__app] = self
+      env[Tzispa::ENV_TZISPA_APP] = self
+      env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
       middleware.call(env)
     end
 
