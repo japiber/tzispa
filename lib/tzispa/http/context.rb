@@ -35,11 +35,7 @@ module Tzispa
       end
 
       def layout
-        if config.auth_required && !logged? && router_params[:layout]
-          config.default_layout
-        else
-          router_params[:layout] || config.default_layout
-        end
+        router_params && router_params[:layout]
       end
 
       def set_last_access
