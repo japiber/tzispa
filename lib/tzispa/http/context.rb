@@ -35,7 +35,7 @@ module Tzispa
       end
 
       def layout
-        router_params && router_params[:layout]
+        router_params&.fetch(:layout, nil)
       end
 
       def set_last_access
