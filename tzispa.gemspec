@@ -17,13 +17,13 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rack',           '~> 1.5'
   s.add_dependency 'puma',           '~> 3.1'
-  s.add_dependency 'i18n',           '~> 0.7'
-  s.add_dependency 'http_router',    '~> 0.11'
-  s.add_dependency 'moneta',         '~> 0.8'
+  s.add_dependency 'i18n',           '~> 0.7.0'
+  s.add_dependency 'http_router',    '~> 0.11.2'
+  s.add_dependency 'moneta',         '~> 0.8.0'
   s.add_dependency 'tzispa_helpers', '~> 0.1.0'
   s.add_dependency 'tzispa_utils',   '~> 0.2.1'
   s.add_dependency 'tzispa_rig',     '~> 0.2.7'
-  s.add_dependency 'tzispa_data',    '~> 0.1'
+  s.add_dependency 'tzispa_data',    '~> 0.1.1'
 
   s.files         = Dir.glob("{lib,bin}/**/*") + %w(README.md CHANGELOG.md LICENSE tzispa.gemspec)
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }

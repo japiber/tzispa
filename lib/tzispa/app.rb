@@ -14,6 +14,10 @@ require "tzispa_rig"
 
 module Tzispa
 
+  ENV_TZISPA_APP     = :tzispa__app
+  ENV_TZISPA_CONTEXT = :tzispa__context
+  
+
   class Application
     extend Forwardable
 
