@@ -49,7 +49,6 @@ module Tzispa
     def load_default_stack
       @default_stack_loaded ||= begin
         _load_session_middleware
-        _load_assets_middleware
         use Rack::MethodOverride
         true
       end
@@ -66,18 +65,6 @@ module Tzispa
           secret: @application.config.sessions.secret
       end
     end
-
-    def _load_assets_middleware
-      use Rack::Static,
-        :urls => ["/img", "/js", "/css", "/*.ico"],
-        :root => "public",
-        :header_rules => [
-           [:all, {'Cache-Control' => 'public, max-age=72000'}],
-           ['css', {'Content-Type' => 'text/css; charset=utf-8'}],
-           ['js', {'Content-Type' => 'text/javascript; charset=utf-8'}]
-        ]
-    end
-
 
   end
 end
