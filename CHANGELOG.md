@@ -2,6 +2,16 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.5
+- remove _load_assets_middleware
+- add browser detection capability
+- App environment constants names moved to app.rb
+- code beautify
+- Fix crash if there isn't any layout in http context
+- Moved routes from Config namespace to Tzispa root
+- Moved context creation from Controller::Base to Application::call
+- code clean and organize
+
 ## v0.4.4
 - Add new template_cache config parameter
 
