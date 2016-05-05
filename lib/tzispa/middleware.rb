@@ -40,7 +40,7 @@ module Tzispa
     def load_middleware(middleware)
       case middleware
       when String
-        @application.domain.const_get(middleware)
+        Object.const_get(middleware)
       else
         middleware
       end
