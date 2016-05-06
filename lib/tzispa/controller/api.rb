@@ -30,7 +30,11 @@ module Tzispa
 
       def redirect
         context.flash << hnd.message
-        url = hnd.data || request.referer
+        url = if hnd.data
+          hnd.data.start_with?('#') ? "#{request.referer}#{hnd.data}" : hnd.data
+        else
+          request.referer
+        end
         context.redirect url, response
       end
 
