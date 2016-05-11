@@ -46,10 +46,14 @@ module Tzispa
       end
 
       def json
-        data = hnd.data.is_a?(::Hash) ? hnd.data : JSON.parse(hnd.data)
-        data[:__result_status] = hnd.status
-        data[:__result_message] = hnd.message
-        response.body << data.to_json.to_s
+        if hnd.data.is_a?(::Hash)
+          data = hnd.data
+          data[:__result_status] = hnd.status
+          data[:__result_message] = hnd.message
+        else
+          data = JSON.parse(hnd.data)
+        end
+        response.body << data.to_json
         content_type :json
         set_action_headers
       end
