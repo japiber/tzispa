@@ -16,7 +16,7 @@ module Tzispa
       include Tzispa::Helpers::Security
 
       attr_reader    :request, :response
-      def_delegators :@request, :session
+      def_delegators :@request, :session, :browser
 
       SESSION_LAST_ACCESS   = :__last_access
       SESSION_AUTH_USER     = :__auth__user
