@@ -3,7 +3,8 @@ Tzispa
 General purpose web framework
 
 ## v0.4.8
-- rename context method error to error_500 for conflict with response helper
+- rename context method error to error_500 for conflict with response helper error method
+- pass response.status to error_page in controller base class
 
 ## v0.4.7
 - remove browser detection obsolete code
