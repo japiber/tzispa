@@ -8,6 +8,7 @@ require 'tzispa/routes'
 require 'tzispa/config/appconfig'
 require 'tzispa/middleware'
 require 'tzispa/http/context'
+require 'tzispa/helpers/error_view'
 require 'tzispa_data'
 require "tzispa_rig"
 
@@ -20,6 +21,8 @@ module Tzispa
 
   class Application
     extend Forwardable
+
+    include Tzispa::Helpers::ErrorView
 
     attr_reader :domain, :config, :middleware, :repository, :engine, :logger
     def_delegator :@middleware, :use
@@ -73,8 +76,19 @@ module Tzispa
 
     def call(env)
       env[Tzispa::ENV_TZISPA_APP] = self
-      env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
-      middleware.call(env)
+      context = Tzispa::Http::Context.new(env)
+      env[Tzispa::ENV_TZISPA_CONTEXT] = context
+      begin
+        middleware.call(env)
+      rescue StandardError, ScriptError => ex
+        logger.error "#{ex.message}\n#{ex.backtrace.map { |trace| "\t #{trace}" }.join('\n') if ex.respond_to?(:backtrace) && ex.backtrace}"
+        if config.developing
+          context.error error_report(ex)
+        else
+          context.error error_page(domain)
+        end
+        context.response.finish
+      end
     end
 
     def load!

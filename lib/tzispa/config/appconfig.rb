@@ -35,14 +35,13 @@ module Tzispa
         @config ||= Tzispa::Config::Yaml.load(filename)
       end
 
-      def create_default(host:, layout: 'index', dev_mode: true, locale: 'en')
+      def create_default(host:, layout: 'index', locale: 'en')
         hcfg = Hash.new.tap { |cfg|
           cfg['id'] = domain.name
           cfg['default_layout'] = layout
           cfg['default_format'] = 'htm'
           cfg['host_name'] = host
           cfg['canonical_url'] = "http://#{host}"
-          cfg['dev_mode'] = dev_mode
           cfg['default_encoding'] = 'utf-8'
           cfg['auth_required'] = false
           cfg['salt'] = secret(24)

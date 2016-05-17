@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.7
+- remove browser detection obsolete code
+- remake app error handling and reporting
+
 ## v0.4.6
 - add browser detection support
 - allow specify a url fragment to redirect to the referer page section
