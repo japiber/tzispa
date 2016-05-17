@@ -12,7 +12,7 @@ module Tzispa
       extend Forwardable
 
       attr_reader :context
-      def_delegators :@context, :request, :response, :config, :error
+      def_delegators :@context, :request, :response, :config
 
       def initialize(callmethod=nil)
         @callmethod = callmethod
@@ -31,7 +31,7 @@ module Tzispa
           send "#{@callmethod}"
         }
         response.status = status if status.is_a?(Integer)
-        error context.app.error_page(response.status) if (response.client_error? || response.server_error?)
+        context.error context.app.error_page(context.app.domain, status: response.status) if (response.client_error? || response.server_error?)
       end
 
 
