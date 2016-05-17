@@ -83,9 +83,9 @@ module Tzispa
       rescue StandardError, ScriptError => ex
         logger.error "#{ex.message}\n#{ex.backtrace.map { |trace| "\t #{trace}" }.join('\n') if ex.respond_to?(:backtrace) && ex.backtrace}"
         if config.developing
-          context.error error_report(ex)
+          context.error_500 error_report(ex)
         else
-          context.error error_page(domain)
+          context.error_500 error_page(domain)
         end
         context.response.finish
       end

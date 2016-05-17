@@ -31,7 +31,7 @@ module Tzispa
           send "#{@callmethod}"
         }
         response.status = status if status.is_a?(Integer)
-        context.error context.app.error_page(context.app.domain, status: response.status) if (response.client_error? || response.server_error?)
+        context.error_500 context.app.error_page(context.app.domain, status: response.status) if (response.client_error? || response.server_error?)
       end
 
 

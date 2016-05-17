@@ -38,12 +38,12 @@ module Tzispa
         router_params&.fetch(:layout, nil)
       end
 
-      def error(body)
+      def error_500(body)
         500.tap { |code|
           response.status = code
           response.body = body
         }
-      end      
+      end
 
       def set_last_access
         session[SESSION_LAST_ACCESS] = Time.now.utc.iso8601
