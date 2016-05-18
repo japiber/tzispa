@@ -36,6 +36,8 @@ module Tzispa
           request_method == "UNLINK"
         end
 
+        alias secure? ssl?
+
     end
   end
 end
