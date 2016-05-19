@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.10
+- http/context api method return a canonical url including hostname
+
 ## v0.4.9
 - in http/response.rb add missing alias secure? for ssl?
 - in controller/api.rb fix redirect url if data is empty
