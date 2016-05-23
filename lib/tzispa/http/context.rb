@@ -38,13 +38,6 @@ module Tzispa
         router_params&.fetch(:layout, nil)
       end
 
-      def error_500(body)
-        500.tap { |code|
-          response.status = code
-          response.body = body
-        }
-      end
-
       def set_last_access
         session[SESSION_LAST_ACCESS] = Time.now.utc.iso8601
       end
@@ -72,6 +65,12 @@ module Tzispa
       def logout
         session.delete(SESSION_AUTH_USER)
       end
+
+      def error_500(str)
+        500.tap { |code|
+          response.body = str if str
+        }
+      end      
 
       def path(path_id, params={})
         app.class.routes.path path_id, params
