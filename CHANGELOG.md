@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.11
+- Rescue exceptions and catch halts on controller/base
+- http/context error_500 not sets response.status
+- Rescue exceptions in app.call only log and set response.status previous code moved to controller/base
+
 ## v0.4.10
 - http/context api method return a canonical url including hostname
 
