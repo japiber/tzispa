@@ -3,6 +3,7 @@
 require 'forwardable'
 require 'tzispa/version'
 require 'tzispa/rig/template'
+require 'tzispa/helpers/error_view'
 
 
 module Tzispa
@@ -10,6 +11,8 @@ module Tzispa
 
     class Base
       extend Forwardable
+
+      include Tzispa::Helpers::ErrorView
 
       attr_reader :context
       def_delegators :@context, :request, :response, :config
@@ -28,12 +31,17 @@ module Tzispa
 
       def invoke(callmethod)
         status = catch(:halt) {
-          send "#{@callmethod}"
+          begin
+            send "#{@callmethod}"
+          rescue StandardError, ScriptError => exx
+            context.error_500( config.developing ? debug_info(exx) : nil )
+          end
         }
         response.status = status if status.is_a?(Integer)
-        context.error_500 context.app.error_page(context.app.domain, status: response.status) if (response.client_error? || response.server_error?)
+        if (response.client_error? || response.server_error?) && !config.developing
+          response.body = error_page(context.domain)
+        end
       end
-
 
     end
 
