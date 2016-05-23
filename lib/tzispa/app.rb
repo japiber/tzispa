@@ -8,7 +8,6 @@ require 'tzispa/routes'
 require 'tzispa/config/appconfig'
 require 'tzispa/middleware'
 require 'tzispa/http/context'
-require 'tzispa/helpers/error_view'
 require 'tzispa_data'
 require "tzispa_rig"
 
@@ -21,8 +20,6 @@ module Tzispa
 
   class Application
     extend Forwardable
-
-    include Tzispa::Helpers::ErrorView
 
     attr_reader :domain, :config, :middleware, :repository, :engine, :logger
     def_delegator :@middleware, :use
@@ -76,18 +73,13 @@ module Tzispa
 
     def call(env)
       env[Tzispa::ENV_TZISPA_APP] = self
-      context = Tzispa::Http::Context.new(env)
-      env[Tzispa::ENV_TZISPA_CONTEXT] = context
+      env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
       begin
         middleware.call(env)
-      rescue StandardError, ScriptError => ex
-        logger.error "#{ex.message}\n#{ex.backtrace.map { |trace| "\t #{trace}" }.join('\n') if ex.respond_to?(:backtrace) && ex.backtrace}"
-        if config.developing
-          context.error_500 error_report(ex)
-        else
-          context.error_500 error_page(domain)
-        end
-        context.response.finish
+      rescue => ex
+        logger.error ex.message
+        env[Tzispa::ENV_TZISPA_CONTEXT].response.status = 500
+        env[Tzispa::ENV_TZISPA_CONTEXT].response.finish
       end
     end
 
