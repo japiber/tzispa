@@ -30,16 +30,22 @@ module Tzispa
       private
 
       def invoke(callmethod)
+        debug_info = nil
         status = catch(:halt) {
           begin
             send "#{@callmethod}"
           rescue StandardError, ScriptError => exx
-            context.error_500( config.developing ? debug_info(exx) : nil )
+            debug_info = debug_info(exx) if config.developing
+            500
           end
         }
         response.status = status if status.is_a?(Integer)
-        if (response.client_error? || response.server_error?) && !config.developing
-          response.body = error_page(context.domain)
+        if response.client_error?
+          response.body = error_page(context.domain, status: response.status)
+        elsif response.server_error?
+          response.body = debug_info ?
+            debug_info :
+            error_page(context.domain, status: response.status)
         end
       end
 
