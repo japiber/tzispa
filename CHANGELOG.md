@@ -2,6 +2,12 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.13
+- Set router default app to http_error 404
+
+## v0.4.12
+- Fix controller/base all errors go to error 500
+
 ## v0.4.11
 - Rescue exceptions and catch halts on controller/base
 - http/context error_500 not sets response.status
