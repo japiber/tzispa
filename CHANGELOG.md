@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.15
+- move context creation from app to middleware
+- remove controller/layout custom headers
+
+
 ## v0.4.14
 - remove moneta session in middleware: now use session goes in App class definition
 - remove repository dup in context because isn't required without the respository.use method
