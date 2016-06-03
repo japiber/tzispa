@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'moneta'
-require 'rack/session/moneta'
-
 module Tzispa
   class Middleware
 
@@ -48,23 +45,11 @@ module Tzispa
 
     def load_default_stack
       @default_stack_loaded ||= begin
-        _load_session_middleware
-        use Rack::MethodOverride
+        #use Rack::MethodOverride
         true
       end
     end
 
-    def _load_session_middleware
-      if @application.config.sessions.enabled
-        use Rack::Session::Moneta,
-          store: Moneta.new(:HashFile, dir: @application.config.sessions.store_path, expires: true, threadsafe: true),
-          key: "_#{@application.config.id}__",
-          domain: @application.config.host_name,
-          path: '/',
-          expire_after: @application.config.sessions.timeout,
-          secret: @application.config.sessions.secret
-      end
-    end
 
   end
 end
