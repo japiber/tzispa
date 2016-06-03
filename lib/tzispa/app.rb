@@ -67,20 +67,12 @@ module Tzispa
 
     def initialize(domain_name)
       @domain = Domain.new(domain_name)
-      @middleware = Middleware.new self
       @config = Config::AppConfig.new(@domain).load!
+      @middleware = Middleware.new self
     end
 
     def call(env)
-      env[Tzispa::ENV_TZISPA_APP] = self
-      env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
-      begin
-        middleware.call(env)
-      rescue => ex
-        logger.error ex.message
-        env[Tzispa::ENV_TZISPA_CONTEXT].response.status = 500
-        env[Tzispa::ENV_TZISPA_CONTEXT].response.finish
-      end
+      middleware.call(env)
     end
 
     def load!

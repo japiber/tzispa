@@ -3,7 +3,6 @@
 module Tzispa
   class Middleware
 
-
     def initialize(app)
       @stack = []
       @application = app
@@ -25,7 +24,15 @@ module Tzispa
     end
 
     def call(env)
-      @builder.call(env)
+      begin
+        env[Tzispa::ENV_TZISPA_APP] = @application
+        env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
+        @builder.call(env)
+      rescue => ex
+        @application.logger.error "#{ex.message} (#{ex.class}):\n #{ex.backtrace&.join("\n\t")}"
+        env[Tzispa::ENV_TZISPA_CONTEXT].response.status = 500
+        env[Tzispa::ENV_TZISPA_CONTEXT].response.finish
+      end
     end
 
     def use(middleware, *args, &blk)
