@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'securerandom'
 require 'tzispa/context'
 require 'tzispa/http/response'
 require 'tzispa/http/request'
@@ -70,7 +71,7 @@ module Tzispa
         500.tap { |code|
           response.body = str if str
         }
-      end      
+      end
 
       def path(path_id, params={})
         app.class.routes.path path_id, params
