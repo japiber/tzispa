@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.14
+- remove moneta session in middleware: now use session goes in App class definition
+- remove repository dup in context because isn't required without the respository.use method
+- add missing require securerandom for session_id in http/context
+
 ## v0.4.13
 - Set router default app to http_error 404
 
