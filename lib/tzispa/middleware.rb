@@ -12,13 +12,13 @@ module Tzispa
       @builder = ::Rack::Builder.new
       load_default_stack
       @stack.each { |m, args, block| @builder.use load_middleware(m), *args, &block }
-      @builder.run @application.class.router
+      @builder.run @application.router
       self
     end
 
-    def map(mount_path, builder)
+    def load_app(path, builder)
       app = @application
-      builder.map mount_path do
+      builder.map path do
         run app.load!
       end
     end
