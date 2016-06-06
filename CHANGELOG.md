@@ -2,10 +2,13 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.16
+- check response_verb before send it to the handler in controller/api
+- move routes from app-class to app-instance
+
 ## v0.4.15
 - move context creation from app to middleware
 - remove controller/layout custom headers
-
 
 ## v0.4.14
 - remove moneta session in middleware: now use session goes in App class definition
