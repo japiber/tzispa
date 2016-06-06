@@ -16,6 +16,8 @@ module Tzispa
       include Tzispa::Helpers::Security
       include Tzispa::Helpers::Response
 
+      attr_reader :hnd
+
       def dispatch!
         raise Error::InvalidSign.new unless sign?
         @handler, domain_name = context.router_params[:handler].split('.').reverse
@@ -24,7 +26,7 @@ module Tzispa
         @predicate = context.router_params[:predicate]
         @hnd = handler_class.new(context)
         @predicate ? hnd.send(@verb, @predicate) : hnd.send(@verb)
-        send hnd.response_verb
+        send hnd.response_verb if hnd.response_verb && hnd.respond_to?(hnd.response_verb)
         response.finish
       end
 
@@ -112,7 +114,6 @@ module Tzispa
 
       private
 
-      attr_reader :hnd
 
       def set_action_headers
         response['X-API'] = "#{context.router_params[:sign]}:#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}"
