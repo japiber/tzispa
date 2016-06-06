@@ -26,7 +26,7 @@ module Tzispa
         @predicate = context.router_params[:predicate]
         @hnd = handler_class.new(context)
         @predicate ? hnd.send(@verb, @predicate) : hnd.send(@verb)
-        send hnd.response_verb if hnd.response_verb && hnd.respond_to?(hnd.response_verb)
+        send hnd.response_verb if hnd.response_verb
         response.finish
       end
 
