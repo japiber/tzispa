@@ -74,7 +74,7 @@ module Tzispa
       end
 
       def path(path_id, params={})
-        app.class.routes.path path_id, params
+        app.routes.path path_id, params
       end
 
       def canonical_url(path_id, params={})
