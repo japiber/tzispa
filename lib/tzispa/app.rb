@@ -28,8 +28,6 @@ module Tzispa
 
     class << self
 
-      attr_accessor :routes
-
       def inherited(base)
         super
         base.class_eval do
@@ -51,19 +49,18 @@ module Tzispa
         }
       end
 
-      def mount(mount_point, builder)
+      def mount(path, builder)
         self.new.tap { |app|
-          self.routes ||= Routes.new(mount_point)
-          yield(routes)
-          app.middleware.map mount_point, builder
+          app.routes ||= Routes.new(path)
+          yield(app.routes)
+          app.middleware.load_app path, builder
         }
       end
 
-      def router
-        self.routes&.router
-      end
 
     end
+
+    attr_accessor :routes
 
     def initialize(domain_name)
       @domain = Domain.new(domain_name)
@@ -75,22 +72,24 @@ module Tzispa
       middleware.call(env)
     end
 
+    def router
+      routes&.router
+    end
+
     def load!
-      unless @loaded
-        Mutex.new.synchronize {
-          load_locales
-          @repository = Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
-          @engine = Rig::Engine.new(self, @config.template_cache.enabled, @config.template_cache.size)
-          @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
-          @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
-          @domain.require_dir 'helpers'
-          @domain.require_dir 'api'
-          @domain.require_dir 'middleware'
-          @middleware.load!
-          @loaded = true
-        }
-      end
-      self
+      Mutex.new.synchronize {
+        load_locales
+        @repository = Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
+        @engine = Rig::Engine.new(self, @config.template_cache.enabled, @config.template_cache.size)
+        @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
+        @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
+        @domain.require_dir 'helpers'
+        @domain.require_dir 'api'
+        @domain.require_dir 'middleware'
+        @middleware.load!
+        @loaded = true
+      }
+    self
     end
 
     private
