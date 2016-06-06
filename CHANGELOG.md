@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.17
+- response_verb is send to the conttroller not to the handler ...
+
 ## v0.4.16
 - check response_verb before send it to the handler in controller/api
 - move routes from app-class to app-instance
