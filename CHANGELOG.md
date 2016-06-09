@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.18
+- rescue Tzispa::Rig::NotFound in controller/base to set response status code 404
+
 ## v0.4.17
 - response_verb is send to the conttroller not to the handler ...
 
