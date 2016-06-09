@@ -34,6 +34,9 @@ module Tzispa
         status = catch(:halt) {
           begin
             send "#{@callmethod}"
+          rescue Tzispa::Rig::NotFound => ex
+            context.logger.info "#{ex.message} (#{ex.class})"
+            404
           rescue StandardError, ScriptError => ex
             context.logger.error "#{ex.message} (#{ex.class}):\n #{ex.backtrace.join("\n\t") if ex.respond_to?(:backtrace) && ex.backtrace}"
             debug_info = debug_info(ex) if config.developing
