@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.19
+- fix cli api command errors
+
 ## v0.4.18
 - rescue Tzispa::Rig::NotFound in controller/base to set response status code 404
 
