@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require 'tzispa/version'
-require 'tzispa/rig/template'
 require 'tzispa/helpers/error_view'
 
 
