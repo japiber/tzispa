@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.4.20
+- Add signed_api route and controller previous api controller is for unsigned api calls
+
 ## v0.4.19
 - fix cli api command errors
 
