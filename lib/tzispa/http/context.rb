@@ -82,9 +82,14 @@ module Tzispa
       end
 
       def api(handler, verb, predicate, sufix)
-        sign = sign_array [handler, verb, predicate], app.config.salt
-        canonical_url :api, sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+        canonical_url :api, handler: handler, verb: verb, predicate: predicate, sufix: sufix
       end
+
+      def sapi(handler, verb, predicate, sufix)
+        sign = sign_array [handler, verb, predicate], app.config.salt
+        canonical_url :sapi, sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+      end
+
 
     end
 

@@ -50,7 +50,7 @@ module Tzispa
     end
 
     def signed_api(path, methods=nil, controller=nil)
-      add :api, path, methods, controller || 'signed_api:dispatch!'
+      add :sapi, path, methods, controller || 'signed_api:dispatch!'
     end
 
     def site(path, methods=nil, controller=nil)
