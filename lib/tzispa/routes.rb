@@ -49,6 +49,10 @@ module Tzispa
       add :api, path, methods, controller || 'api:dispatch!'
     end
 
+    def signed_api(path, methods=nil, controller=nil)
+      add :api, path, methods, controller || 'signed_api:dispatch!'
+    end
+
     def site(path, methods=nil, controller=nil)
       add :site, path, methods, controller || 'layout:render!'
     end

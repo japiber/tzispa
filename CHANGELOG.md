@@ -56,7 +56,7 @@ General purpose web framework
 - middleware management fixes
 
 ## v0.4.5
-- remove _load_assets_middleware
+- remove load_assets_middleware
 - add browser detection capability
 - App environment constants names moved to app.rb
 - code beautify
