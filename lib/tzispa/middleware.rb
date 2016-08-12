@@ -53,8 +53,7 @@ module Tzispa
     private
 
     def load_default_stack
-      @default_stack_loaded ||= begin
-        use TzispaEnv.new(application)
+      @default_stack_loaded ||= begin        
         true
       end
     end
