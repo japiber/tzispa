@@ -17,14 +17,12 @@ module Tzispa
 
       def initialize(app, callmethod=nil)
         @callmethod = callmethod
-        @appllication = app
+        @application = app
       end
 
       def call(env)
-        @context = Tzispa::Http::Context.new(env)
-        env[Tzispa::ENV_TZISPA_APP] = @application
-        env[Tzispa::ENV_TZISPA_CONTEXT] = @context
-
+        @context = Tzispa::Http::Context.new(@application, env)
+        #env[Tzispa::ENV_TZISPA_CONTEXT] = @context
         #@context = env[Tzispa::ENV_TZISPA_CONTEXT]
         invoke @callmethod if @callmethod
         response.finish

@@ -4,20 +4,6 @@ require 'tzispa/http/context'
 
 module Tzispa
 
-  class TzispaEnv
-
-    def initialize(main, app)
-      @main = main
-      @app = app
-    end
-
-    def call(env)
-      env[Tzispa::ENV_TZISPA_APP] = @app
-      env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
-      @main.call(env)
-    end
-  end
-
   class Middleware
 
     attr_reader :application, :stack

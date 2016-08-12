@@ -7,16 +7,13 @@ module Tzispa
   class Context
     extend Forwardable
 
-    attr_reader    :env
+    attr_reader    :app, :env
     def_delegators :app, :config, :logger, :domain, :repository
 
-    def initialize(environment)
+    def initialize(app, environment)
       @env = environment
+      @app = app
       I18n.locale = config.locales.default.to_sym if config.respond_to?(:locales)
-    end
-
-    def app
-      @app ||= env[Tzispa::ENV_TZISPA_APP]
     end
 
   end

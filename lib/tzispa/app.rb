@@ -51,7 +51,7 @@ module Tzispa
 
       def mount(path, builder)
         self.new.tap { |app|
-          app.routes ||= Routes.new(path)
+          app.routes ||= Routes.new(app, path)
           yield(app.routes) if block_given?
           builder.map path do
             run app.middleware.builder

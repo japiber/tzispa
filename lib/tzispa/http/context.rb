@@ -24,8 +24,8 @@ module Tzispa
       GLOBAL_MESSAGE_FLASH  = :__global_message_flash
 
 
-      def initialize(environment)
-        super(environment)
+      def initialize(app, environment)
+        super(app, environment)
         @request = Tzispa::Http::Request.new(environment)
         @response = Tzispa::Http::Response.new
         session[:id] ||= SecureRandom.uuid if app.config.sessions.enabled
