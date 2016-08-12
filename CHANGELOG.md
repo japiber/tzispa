@@ -4,6 +4,9 @@ General purpose web framework
 
 ## v0.5.1
 - Add result_json facility in Api::Handler
+- Rack update requirement to 2.0
+- Fix http_router not poulating env with rack 2.0
+- Code optimizations in middlaware management
 
 ## v0.5.0
 - Add support for signed and unsigned api calls
