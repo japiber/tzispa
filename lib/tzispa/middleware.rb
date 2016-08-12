@@ -1,37 +1,39 @@
 # frozen_string_literal: true
 
+require 'tzispa/http/context'
+
 module Tzispa
+
+  class TzispaEnv
+
+    def initialize(main, app)
+      @main = main
+      @app = app
+    end
+
+    def call(env)
+      env[Tzispa::ENV_TZISPA_APP] = @app
+      env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
+      @main.call(env)
+    end
+  end
+
   class Middleware
+
+    attr_reader :application, :stack
 
     def initialize(app)
       @stack = []
       @application = app
     end
 
-    def load!
-      @builder = ::Rack::Builder.new
-      load_default_stack
-      @stack.each { |m, args, block| @builder.use load_middleware(m), *args, &block }
-      @builder.run @application.router
-      self
-    end
-
-    def load_app(path, builder)
-      app = @application
-      builder.map path do
-        run app.load!
-      end
-    end
-
-    def call(env)
-      begin
-        env[Tzispa::ENV_TZISPA_APP] = @application
-        env[Tzispa::ENV_TZISPA_CONTEXT] = Tzispa::Http::Context.new(env)
-        @builder.call(env)
-      rescue => ex
-        @application.logger.error "#{ex.message} (#{ex.class}):\n #{ex.backtrace&.join("\n\t")}"
-        env[Tzispa::ENV_TZISPA_CONTEXT].response.status = 500
-        env[Tzispa::ENV_TZISPA_CONTEXT].response.finish
+    def builder
+      mw = self
+      @builder ||= ::Rack::Builder.new do
+        app = mw.application.load!
+        use TzispaEnv, app
+        mw.stack.each { |m, args, block| use mw.load(m), *args, &block }
+        run app.routes.router
       end
     end
 
@@ -39,9 +41,7 @@ module Tzispa
       @stack.unshift [middleware, args, blk]
     end
 
-    private
-
-    def load_middleware(middleware)
+    def load(middleware)
       case middleware
       when String
         Object.const_get(middleware)
@@ -50,9 +50,11 @@ module Tzispa
       end
     end
 
+    private
+
     def load_default_stack
       @default_stack_loaded ||= begin
-        #use Rack::MethodOverride
+        use TzispaEnv.new(application)
         true
       end
     end

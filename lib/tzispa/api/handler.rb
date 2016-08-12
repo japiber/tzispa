@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'json'
 
 module Tzispa
   module Api
@@ -32,6 +33,10 @@ module Tzispa
         @response_verb = response_verb
         @data = data
         @detailed_error = detailed_error
+      end
+
+      def result_json(status=HANDLED_UNDEFINED, data=nil, detailed_error=nil)
+        result response_verb: :json, status: status, data: data.to_json, detailed_error: detailed_error
       end
 
       def message

@@ -19,8 +19,8 @@ module Tzispa
         @callmethod = callmethod
       end
 
-      def call(environment)
-        @context = environment[Tzispa::ENV_TZISPA_CONTEXT]
+      def call(env)
+        @context = env[Tzispa::ENV_TZISPA_CONTEXT]
         invoke @callmethod if @callmethod
         response.finish
       end

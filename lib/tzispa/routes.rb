@@ -5,6 +5,7 @@ require 'http_router'
 require 'tzispa/utils/string'
 require 'tzispa/controller/http_error'
 
+
 module Tzispa
 
   class Routes
@@ -13,10 +14,10 @@ module Tzispa
 
     attr_reader :router, :map_path
 
-    def initialize(map_path=nil)
+    def initialize(root=nil)
       @router = HttpRouter.new
       @router.default Tzispa::Controller::HttpError.new('error_404')
-      @map_path = map_path unless map_path=='/'
+      @map_path = root unless root=='/'
     end
 
     def path(path_id, params={})
@@ -35,11 +36,12 @@ module Tzispa
         controller_module = CONTROLLERS_BASE
         require "tzispa/controller/#{req_controller}"
       end
-      @router.add(path, methods ? {request_method: methods} : nil ).tap { |rule|
+      @router.add(path, methods ? {request_method: methods} : nil).tap { |rule|
         rule.to TzString.constantize("#{controller_module}::#{controller}").new(callmethod)
         rule.name = route_id
       }
     end
+
 
     def index(path, methods=nil, controller=nil)
       add :index, path, methods, controller || 'layout:render!'

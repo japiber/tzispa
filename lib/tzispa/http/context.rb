@@ -32,7 +32,7 @@ module Tzispa
       end
 
       def router_params
-        env['router.params']
+        env['router.params'] || Hash.new
       end
 
       def layout

@@ -7,7 +7,6 @@ require 'tzispa/domain'
 require 'tzispa/routes'
 require 'tzispa/config/appconfig'
 require 'tzispa/middleware'
-require 'tzispa/http/context'
 require 'tzispa_data'
 require "tzispa_rig"
 
@@ -22,12 +21,13 @@ module Tzispa
     extend Forwardable
 
     attr_reader :domain, :config, :middleware, :repository, :engine, :logger
+    attr_accessor :routes
+
     def_delegator :@middleware, :use
     def_delegator :@domain, :name
 
 
     class << self
-
       def inherited(base)
         super
         base.class_eval do
@@ -52,28 +52,18 @@ module Tzispa
       def mount(path, builder)
         self.new.tap { |app|
           app.routes ||= Routes.new(path)
-          yield(app.routes)
-          app.middleware.load_app path, builder
+          yield(app.routes) if block_given?
+          builder.map path do
+            run app.middleware.builder
+          end
         }
       end
-
-
     end
-
-    attr_accessor :routes
 
     def initialize(domain_name)
       @domain = Domain.new(domain_name)
       @config = Config::AppConfig.new(@domain).load!
       @middleware = Middleware.new self
-    end
-
-    def call(env)
-      middleware.call(env)
-    end
-
-    def router
-      routes&.router
     end
 
     def load!
@@ -86,10 +76,9 @@ module Tzispa
         @domain.require_dir 'helpers'
         @domain.require_dir 'api'
         @domain.require_dir 'middleware'
-        @middleware.load!
         @loaded = true
       }
-    self
+      self
     end
 
     private

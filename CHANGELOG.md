@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.1
+- Add result_json facility in Api::Handler
+
 ## v0.5.0
 - Add support for signed and unsigned api calls
 
