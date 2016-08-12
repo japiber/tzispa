@@ -12,15 +12,20 @@ module Tzispa
 
       include Tzispa::Helpers::ErrorView
 
-      attr_reader :context
+      attr_reader :context, :application
       def_delegators :@context, :request, :response, :config
 
-      def initialize(callmethod=nil)
+      def initialize(app, callmethod=nil)
         @callmethod = callmethod
+        @appllication = app
       end
 
       def call(env)
-        @context = env[Tzispa::ENV_TZISPA_CONTEXT]
+        @context = Tzispa::Http::Context.new(env)
+        env[Tzispa::ENV_TZISPA_APP] = @application
+        env[Tzispa::ENV_TZISPA_CONTEXT] = @context
+
+        #@context = env[Tzispa::ENV_TZISPA_CONTEXT]
         invoke @callmethod if @callmethod
         response.finish
       end

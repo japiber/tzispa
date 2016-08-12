@@ -14,8 +14,9 @@ module Tzispa
 
     attr_reader :router, :map_path
 
-    def initialize(root=nil)
+    def initialize(app, root=nil)
       @router = HttpRouter.new
+      @application = app
       @router.default Tzispa::Controller::HttpError.new('error_404')
       @map_path = root unless root=='/'
     end
@@ -37,7 +38,7 @@ module Tzispa
         require "tzispa/controller/#{req_controller}"
       end
       @router.add(path, methods ? {request_method: methods} : nil).tap { |rule|
-        rule.to TzString.constantize("#{controller_module}::#{controller}").new(callmethod)
+        rule.to TzString.constantize("#{controller_module}::#{controller}").new(@application, callmethod)
         rule.name = route_id
       }
     end

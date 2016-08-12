@@ -30,8 +30,8 @@ module Tzispa
     def builder
       mw = self
       @builder ||= ::Rack::Builder.new do
+        #mw.load_default_stack
         app = mw.application.load!
-        use TzispaEnv, app
         mw.stack.each { |m, args, block| use mw.load(m), *args, &block }
         run app.routes.router
       end
@@ -50,11 +50,10 @@ module Tzispa
       end
     end
 
-    private
-
     def load_default_stack
-      @default_stack_loaded ||= begin        
-        true
+      @default_stack_loaded ||= begin
+        app = application.load!
+        #use TzispaEnv, app
       end
     end
 
