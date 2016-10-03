@@ -2,10 +2,13 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.2
+- Api download data[:path] must contain full path to the file
+
 ## v0.5.1
 - Add result_json facility in Api::Handler
 - Rack update requirement to 2.0
-- Fix http_router not poulating env with rack 2.0
+- Fix http_router not populating env with rack 2.0
 - Code optimizations in middlaware management
 
 ## v0.5.0
