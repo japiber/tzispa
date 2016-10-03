@@ -44,12 +44,12 @@ module Tzispa
         @predicate = context.router_params[:predicate]
         @hnd = handler_class.new(context)
         @predicate ? hnd.send(@verb, @predicate) : hnd.send(@verb)
+        context.flash << hnd.message
         send hnd.response_verb if hnd.response_verb
         response.finish
       end
 
       def redirect
-        context.flash << hnd.message
         url = if hnd.data && !hnd.data.strip.empty?
           hnd.data.start_with?('#') ? "#{request.referer}#{hnd.data}" : hnd.data
         else
@@ -59,7 +59,6 @@ module Tzispa
       end
 
       def html
-        context.flash << hnd.message
         response.body << hnd.data
         content_type :htm
         set_action_headers
@@ -79,17 +78,13 @@ module Tzispa
       end
 
       def text
-        context.flash << hnd.message
         response.body << hnd.data
         content_type :text
         set_action_headers
       end
 
       def download
-        context.flash << hnd.message
-        data = hnd.data
-        path = "#{Dir.pwd}/#{data[:path]}"
-        send_file path, data
+        send_file hnd.data[:path], hnd.data
       end
 
       def handler_class_name
