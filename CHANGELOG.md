@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.3
+- Add basic inter-app operability for api and url calls
+
 ## v0.5.2
 - Api download data[:path] must contain full path to the file
 
