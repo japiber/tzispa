@@ -77,19 +77,35 @@ module Tzispa
         app.routes.path path_id, params
       end
 
+      def app_path(app_name, path_id, params={})
+        app[app_name].routes.path path_id, params
+      end
+
       def canonical_url(path_id, params={})
         app.config.canonical_url + path(path_id, params)
       end
 
-      def api(handler, verb, predicate, sufix)
-        canonical_url :api, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+      def app_canonical_url(app_name, path_id, params={})
+        app[app_name].config.canonical_url + app_path(app_name, path_id, params)
       end
 
-      def sapi(handler, verb, predicate, sufix)
-        sign = sign_array [handler, verb, predicate], app.config.salt
-        canonical_url :sapi, sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+      def api(handler, verb, predicate, sufix, app_name)
+        unless app_name
+          canonical_url :api, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+        else
+          app_canonical_url app_name, :api, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+        end
       end
 
+      def sapi(handler, verb, predicate, sufix, app_name = nil)
+        unless app_name
+          sign = sign_array [handler, verb, predicate], app.config.salt
+          canonical_url :sapi, sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+        else
+          sign = sign_array [handler, verb, predicate], app[:app_name].config.salt
+          app_canonical_url app_name, :sapi, sign: sign, handler: handler, verb: verb, predicate: predicate, sufix: sufix
+        end
+      end
 
     end
 

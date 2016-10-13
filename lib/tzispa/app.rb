@@ -28,18 +28,10 @@ module Tzispa
 
 
     class << self
-      def inherited(base)
-        super
-        base.class_eval do
-          synchronize do
-            applications.add(base)
-          end
-        end
-      end
 
       def applications
         synchronize do
-          @@applications ||= Set.new
+          @@applications ||= Hash.new{ |hash, key| raise UnknownApplication.new("#{key}") }
         end
       end
 
@@ -49,8 +41,13 @@ module Tzispa
         }
       end
 
+      def [](name)
+        applications[name]
+      end
+
       def mount(path, builder)
         self.new.tap { |app|
+          add(app)
           app.routes ||= Routes.new(app, path)
           yield(app.routes) if block_given?
           builder.map path do
@@ -58,6 +55,16 @@ module Tzispa
           end
         }
       end
+
+      private
+
+      def add(app)
+        synchronize do
+          raise DuplicateDomain.new("You have try to add an app with a duplicate domain name #{app.name}") if applications.has_key? app.name
+          applications[app.name] = app
+        end
+      end
+
     end
 
     def initialize(domain_name)
@@ -81,6 +88,10 @@ module Tzispa
       self
     end
 
+    def [](domain)
+      self.class[domain]
+    end
+
     private
 
     def load_locales
@@ -89,6 +100,13 @@ module Tzispa
         I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"]
       end
     end
+
+    public
+
+    class ApplicationError < StandardError; end
+    class UnknownApplication < ApplicationError; end
+    class DuplicateDomain < ApplicationError; end
+
 
   end
 end
