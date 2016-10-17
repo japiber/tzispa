@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.6
+- more application DSL usage improvements
+- application builder passed in the run method
+- fix router to response http error 404 when no route match is found
+
 ## v0.5.5
 - Changes in application initialize to improve DSL usage
 - Application mount removed
