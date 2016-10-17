@@ -20,8 +20,8 @@ module Tzispa
   class Application
     extend Forwardable
 
-    attr_reader :domain, :config, :middleware, :repository, :engine, :logger
-    attr_accessor :routes
+    attr_reader :domain, :config, :middleware, :repository, :engine,
+                :logger, :mount_path, :builder, :routes
 
     def_delegator :@middleware, :use
     def_delegator :@domain, :name
@@ -45,19 +45,6 @@ module Tzispa
         applications[name]
       end
 
-      def mount(path, builder)
-        self.new.tap { |app|
-          add(app)
-          app.routes ||= Routes.new(app, path)
-          yield(app.routes) if block_given?
-          builder.map path do
-            run app.middleware.builder
-          end
-        }
-      end
-
-      private
-
       def add(app)
         synchronize do
           raise DuplicateDomain.new("You have try to add an app with a duplicate domain name #{app.name}") if applications.has_key? app.name
@@ -67,10 +54,26 @@ module Tzispa
 
     end
 
-    def initialize(domain_name)
+    def initialize(domain_name, mount_path: nil, builder:nil, &block)
       @domain = Domain.new(domain_name)
       @config = Config::AppConfig.new(@domain).load!
       @middleware = Middleware.new self
+      @mount_path = mount_path
+      @builder = builder
+      @routes ||= Routes.new(self, mount_path)
+      instance_eval(&block) if block
+      self.class.add(self)
+    end
+
+    def run
+      if builder
+        this_app = self
+        builder.map mount_path do
+          run this_app.middleware.builder
+        end
+      else
+        middleware.builder
+      end
     end
 
     def load!
