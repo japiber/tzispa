@@ -17,7 +17,7 @@ module Tzispa
     def initialize(app, root=nil)
       @router = HttpRouter.new
       @app = app
-      @router.default Tzispa::Controller::HttpError.new('error_404')
+      @router.default Tzispa::Controller::HttpError.new(app, :error_404)
       @map_path = root unless root=='/'
     end
 

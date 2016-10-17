@@ -28,7 +28,7 @@ module Tzispa
         super(app, environment)
         @request = Tzispa::Http::Request.new(environment)
         @response = Tzispa::Http::Response.new
-        session[:id] ||= SecureRandom.uuid if app.config.sessions.enabled
+        session[:id] ||= SecureRandom.uuid if app&.config&.sessions&.enabled
       end
 
       def router_params

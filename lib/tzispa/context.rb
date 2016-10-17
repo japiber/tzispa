@@ -13,7 +13,7 @@ module Tzispa
     def initialize(app, environment)
       @env = environment
       @app = app
-      I18n.locale = config.locales.default.to_sym if config.respond_to?(:locales)
+      I18n.locale = app.config.locales.default.to_sym if app.config&.respond_to?(:locales)
     end
 
   end
