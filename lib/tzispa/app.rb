@@ -21,7 +21,7 @@ module Tzispa
     extend Forwardable
 
     attr_reader :domain, :config, :middleware, :repository, :engine,
-                :logger, :mount_path, :builder, :routes
+                :logger, :mount_path, :routes
 
     def_delegator :@middleware, :use
     def_delegator :@domain, :name
@@ -54,25 +54,24 @@ module Tzispa
 
     end
 
-    def initialize(domain_name, mount_path: nil, builder:nil, &block)
+    def initialize(domain_name, mount_path: nil, &block)
       @domain = Domain.new(domain_name)
       @config = Config::AppConfig.new(@domain).load!
       @middleware = Middleware.new self
-      @mount_path = mount_path
-      @builder = builder
       @routes ||= Routes.new(self, mount_path)
-      instance_eval(&block) if block
       self.class.add(self)
+      instance_eval(&block) if block
     end
 
-    def run
-      if builder
+    def run(builder=nil)
+      builder ||= ::Rack::Builder.new
+      if routes.map_path
         this_app = self
-        builder.map mount_path do
+        builder.map routes.map_path do
           run this_app.middleware.builder
         end
       else
-        middleware.builder
+        builder.run middleware.builder
       end
     end
 
