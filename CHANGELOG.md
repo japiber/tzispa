@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.5
+- Changes in application initialize to improve DSL usage
+- Application mount removed
+
 ## v0.5.3
 - Add basic inter-app operability for api and url calls
 
