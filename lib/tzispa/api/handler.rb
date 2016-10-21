@@ -63,7 +63,7 @@ module Tzispa
 
       def send(verb, predicate)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless self.class.provides? verb
-        args = predicate ? predicate.split('__') : nil
+        args = predicate ? predicate.split(',') : nil
         __send__ verb, *args
       end
 
