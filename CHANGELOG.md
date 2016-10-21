@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.7
+- add provides DSL method to specify allowe verbs in api handlers
+- handler calling improvements in api the controller
+
 ## v0.5.6
 - more application DSL usage improvements
 - application builder passed in the run method
