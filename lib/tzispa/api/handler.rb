@@ -5,6 +5,14 @@ require 'json'
 
 module Tzispa
   module Api
+
+    class ApiException < StandardError; end
+    class UnknownHandlerVerb < ApiException
+      def initialize(s, name)
+        super("Unknown verb: '#{s}' called in api handler '#{name}'")
+      end
+    end
+
     class Handler
       extend Forwardable
 
@@ -52,6 +60,26 @@ module Tzispa
           nil
         end
       end
+
+      def send(verb, predicate)
+        raise UnknownHandlerVerb.new(verb, self.class.name) unless self.class.provides? verb
+        args = predicate ? predicate.split('__') : nil
+        __send__ verb, *args
+      end
+
+      def self.provides(*args)
+        (@provides ||= Array.new).tap { |prv|
+          args&.each { |s|
+            prv << s.to_sym
+          }
+        }
+      end
+
+      def self.provides?(value)
+        value = value.to_sym
+        @provides&.include?(value) && public_method_defined?(value)
+      end
+
 
       private
 
