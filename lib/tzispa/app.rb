@@ -25,6 +25,7 @@ module Tzispa
 
     def_delegator :@middleware, :use
     def_delegator :@domain, :name
+    def_delegators :@routes, :routing, :route_rig_index, :route_rig_api, :route_rig_signed_api, :route_rig_layout
 
 
     class << self
@@ -54,11 +55,11 @@ module Tzispa
 
     end
 
-    def initialize(domain_name, mount_path: nil, &block)
+    def initialize(domain_name, on: nil, &block)
       @domain = Domain.new(domain_name)
       @config = Config::AppConfig.new(@domain).load!
       @middleware = Middleware.new self
-      @routes ||= Routes.new(self, mount_path)
+      @routes ||= Routes.new(self, on)
       self.class.add(self)
       instance_eval(&block) if block
     end
