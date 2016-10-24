@@ -2,6 +2,13 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.8
+- add api mapping verb to method in lib/tzispa/api/handler.rb
+- add support for api handler mapping verb to method in lib/tzispa/controller/api.rb
+- improve app routing DSL by forwarding methods from routes lib/tzispa/app.rb
+- renamed rig related routing methods in lib/tzispa/routes.rb
+- add path building methods for rig layouts in lib/tzispa/http/context.rb 
+
 ## v0.5.7
 - add provides DSL method to specify allowe verbs in api handlers
 - handler calling improvements in api the controller
