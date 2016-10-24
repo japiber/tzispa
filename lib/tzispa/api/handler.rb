@@ -61,32 +61,30 @@ module Tzispa
         end
       end
 
-      def send(verb, predicate=nil)
+      def call(verb, predicate=nil)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless self.class.provides? verb
         # allow compound predicates
         args = predicate ? predicate.split(',') : nil
-        __send__ verb, *args
+        send verb, *args
       end
 
       def self.provides(*args)
         (@provides ||= Hash.new).tap { |prv|
           args&.each { |s|
-            prv[s] = s
+            prv[s.to_sym] = s
           }
         }
       end
 
       def self.provides?(verb)
-        value = value.to_sym
-        @provides&.include?(verb) && public_method_defined?(@provides[verb])
+        value = verb.to_sym
+        @provides&.include?(value) && public_method_defined?(@provides[value])
       end
 
       def self.mapping(source, dest)
         @provides ||= Hash.new
         @provides[source] = dest
       end
-
-
 
       private
 
