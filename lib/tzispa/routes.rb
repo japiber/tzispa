@@ -25,7 +25,7 @@ module Tzispa
       "#{@map_path}#{@router.path path_id, params}"
     end
 
-    def add(route_id, path, methods, controller)
+    def routing(route_id, path, controller, methods: nil, matching: nil)
       spec_control, callmethod = controller.to_s.split(':')
       mpath = spec_control.split('#')
       req_controller = mpath.pop
@@ -37,27 +37,29 @@ module Tzispa
         controller_module = CONTROLLERS_BASE
         require "tzispa/controller/#{req_controller}"
       end
-      @router.add(path, methods ? {request_method: methods} : nil).tap { |rule|
+      @router.add(path).tap { |rule|
         rule.to TzString.constantize("#{controller_module}::#{controller}").new(@app, callmethod)
         rule.name = route_id
+        rule.add_request_method(methods) if methods
+        rule.add_match_with(matching) if matching
       }
     end
 
 
-    def index(path, methods=nil, controller=nil)
-      add :index, path, methods, controller || 'layout:render!'
+    def route_rig_index(path, controller: nil, methods: nil)
+      routing :index, path, controller || 'layout:render!', methods: methods
     end
 
-    def api(path, methods=nil, controller=nil)
-      add :api, path, methods, controller || 'api:dispatch!'
+    def route_rig_api(path, controller: nil, methods:nil)
+      routing :api, path, controller || 'api:dispatch!', methods: methods
     end
 
-    def signed_api(path, methods=nil, controller=nil)
-      add :sapi, path, methods, controller || 'signed_api:dispatch!'
+    def route_rig_signed_api(path, controller: nil, methods: nil)
+      routing :sapi, path, controller || 'signed_api:dispatch!', methods: methods
     end
 
-    def site(path, methods=nil, controller=nil)
-      add :site, path, methods, controller || 'layout:render!'
+    def route_rig_layout(layout, path, controller: nil, methods: nil)
+      routing layout.to_sym, path, controller || 'layout:render!', methods: methods, matching: {layout: layout.to_s}
     end
 
   end
