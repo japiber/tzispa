@@ -89,6 +89,22 @@ module Tzispa
         app[app_name].config.canonical_url + app_path(app_name, path_id, params)
       end
 
+      def layout_path(layout, params={})
+        app.routes.path layout, params.merge!(layout: layout)
+      end
+
+      def app_layout_path(app_name, layout, params={})
+        app[app_name].routes.path layout, params.merge!(layout: layout)
+      end
+
+      def layout_canonical_url(layout, params={})
+        app.config.canonical_url + layout_path(layout, params)
+      end
+
+      def app_layout_canonical_url(app_name, layout, params={})
+        app[app_name].config.canonical_url + app_layout_path(app_name, layout, params)
+      end
+
       def api(handler, verb, predicate, sufix, app_name)
         unless app_name
           canonical_url :api, handler: handler, verb: verb, predicate: predicate, sufix: sufix
