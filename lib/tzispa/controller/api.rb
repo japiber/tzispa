@@ -46,7 +46,7 @@ module Tzispa
         @verb = context.router_params[:verb]
         @predicate = context.router_params[:predicate]
         @handler = handler_class.new(context)
-        handler.send @verb, @predicate
+        handler.call @verb, @predicate
         context.flash << handler.message
         send handler.response_verb if handler.response_verb
         response.finish
