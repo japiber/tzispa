@@ -59,16 +59,13 @@ module Tzispa
 
       def new_app_code(mount_path)
         Tzispa::Utils::Indenter.new(2).tap { |code|
-          code << "\nclass #{app_class_name} < Tzispa::Application\n\n"
-          code.indent << "def initialize\n"
-          code.indent << "super(:#{domain.name})\n"
+          code << "\nclass #{app_class_name} < Tzispa::Application; end\n\n"
+          code << "my_app = #{app_class_name}.new(#{domain.name}, on: '#{mount_path}')  do\n\n"
+          code.indent << "route_rig_signed_api  '/__api_:sign/:handler/:verb(~:predicate)(/:sufix)'"
+          code.indent << "route_rig_api         '/api/:handler/:verb(~:predicate)(/:sufix)'"
+          code.indent << "route_rig_index       '/'"
           code.unindent << "end\n\n"
-          code.unindent << "end\n\n"
-          code << "#{app_class_name}.mount '/#{mount_path}', self do |route|\n"
-          code.indent << "route.index '/', [:get, :head]\n"
-          code << "route.api   '/__api_:sign/:handler/:verb(~:predicate)(/:sufix)', [:get, :head, :post]\n"
-          code << "route.site  '/:title(/@:id0)(@:id1)(@~:id2)(@@:id3)(@@~:id4)(@@@:id5)/:layout.:format', [:get, :head]\n"
-          code.unindent << "end\n\n"
+          code << "my_app.run self"                      
         }.to_s
       end
 
