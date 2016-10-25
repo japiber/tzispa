@@ -19,7 +19,8 @@ module Tzispa
         'rig',
         'rig/block',
         'rig/layout',
-        'rig/static'
+        'rig/static',
+        'services'
       ]
 
       attr_reader :domain, :config

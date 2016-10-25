@@ -84,6 +84,7 @@ module Tzispa
         @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
         @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
         @domain.require_dir 'helpers'
+        @domain.require_dir 'services'
         @domain.require_dir 'api'
         @domain.require_dir 'middleware'
         @loaded = true
