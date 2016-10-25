@@ -90,11 +90,13 @@ module Tzispa
       end
 
       def layout_path(layout, params={})
-        app.routes.path layout, params.merge!(layout: layout)
+        params = params.merge(layout: layout) unless app.config.default_layout&.to_sym == layout
+        app.routes.path layout, params
       end
 
       def app_layout_path(app_name, layout, params={})
-        app[app_name].routes.path layout, params.merge!(layout: layout)
+        params = params.merge(layout: layout) unless app[app_name].config.default_layout&.to_sym == layout
+        app[app_name].routes.path layout, params
       end
 
       def layout_canonical_url(layout, params={})
