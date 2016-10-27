@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.10
+- fix: check if the given layout is the default_layout in config before promote into the path params hash
+- add tmp folder in the project creation cli command
+
 ## v0.5.9
 - add services folder in app domains
 - updated new app creation template code in cli
