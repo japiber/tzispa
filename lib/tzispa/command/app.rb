@@ -65,7 +65,7 @@ module Tzispa
           code.indent << "route_rig_api         '/api/:handler/:verb(~:predicate)(/:sufix)'"
           code.indent << "route_rig_index       '/'"
           code.unindent << "end\n\n"
-          code << "my_app.run self"                      
+          code << "my_app.run self"
         }.to_s
       end
 

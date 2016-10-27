@@ -19,7 +19,8 @@ module Tzispa
         'public/css/less',
         'public/img',
         'public/js',
-        'repository'
+        'repository',
+        'tmp'
       ]
 
       PROJECT_FILE       = '.tzispaprj'
