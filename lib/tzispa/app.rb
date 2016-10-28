@@ -106,7 +106,7 @@ module Tzispa
     def load_locales
       if @config.respond_to?(:locales)
         I18n.load_path = Dir["config/locales/*.yml"]
-        I18n.load_path += Dir["#{@domain.path}/config/locales/*.yml"]
+        I18n.load_path += Dir["#{@domain.path}/locales/*.yml"]
       end
     end
 
