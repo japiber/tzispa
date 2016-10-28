@@ -13,14 +13,13 @@ module Tzispa
 
       attr_reader :domain, :cfname
 
-      def initialize(domain, configname=nil)
+      def initialize(domain)
         @domain = domain
-        @cfname = configname || CONFIG_FILENAME
         @cftime = nil
       end
 
       def filename
-        @filename ||= "#{domain.path}/config/#{cfname}.yml".freeze
+        @filename ||= "config/#{domain.name}.yml"
       end
 
       def load!
@@ -45,6 +44,7 @@ module Tzispa
           cfg['default_encoding'] = 'utf-8'
           cfg['auth_required'] = false
           cfg['salt'] = secret(24)
+          cfg['secret'] = secret(36)
           cfg['locales'] = Hash.new.tap { |loc|
             loc['preload'] = true
             loc['default'] = locale
