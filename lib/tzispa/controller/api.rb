@@ -17,13 +17,10 @@ module Tzispa
 
       include Tzispa::Helpers::Response
 
-      attr_reader :handler
 
       def self.generate_handler(domain, name)
-        @domain = domain
-        @handler_name = name
         raise "The handler '#{name}' already exist" if File.exist?(handler_class_file)
-        File.open(handler_class_file, "w") { |f|
+        File.open(handler_class_file(domain, name), "w") { |f|
           handler_code = TzString.new
           f.puts handler_code.indenter("require 'tzispa/api/handler'\n\n")
           level = 0
@@ -39,81 +36,76 @@ module Tzispa
         }
       end
 
-
       def dispatch!
-        @handler_name, domain_name = context.router_params[:handler].split('.').reverse
-        @domain = domain_name.nil? ? context.app.domain : Tzispa::Domain.new(name: domain_name)
-        @verb = context.router_params[:verb]
-        @predicate = context.router_params[:predicate]
-        @handler = handler_class.new(context)
-        handler.call @verb, @predicate
+        handler_name, domain_name = context.router_params[:handler].split('.').reverse
+        domain = domain_name.nil? ? context.app.domain : Tzispa::Domain.new(name: domain_name)
+        verb = context.router_params[:verb]
+        predicate = context.router_params[:predicate]
+        handler = self.class.handler_class(domain, handler_name).new(context)
+        handler.call verb, predicate
         context.flash << handler.message
-        send handler.response_verb if handler.response_verb
+        send(handler.response_verb, handler) if handler.response_verb
         response.finish
       end
 
-      def redirect
-        url = if handler.data && !handler.data.strip.empty?
-          handler.data.start_with?('#') ? "#{request.referer}#{handler.data}" : handler.data
+      def redirect(target)
+        url = if target.data && !target.data.strip.empty?
+          target.data.start_with?('#') ? "#{request.referer}#{target.data}" : target.data
         else
           request.referer
         end
         context.redirect url, config.absolute_redirects, response
       end
 
-      def html
-        response.body << handler.data
+      def html(content)
+        response.body << content.data
         content_type :htm
-        set_action_headers
+        set_action_headers content.status
       end
 
-      def json
-        if handler.data.is_a?(::Hash)
-          data = handler.data
-          data[:__result_status] = handler.status
-          data[:__result_message] = handler.message
-        else
-          data = JSON.parse(handler.data)
-        end
+      def json(content)
+        data = content.data.respond_to?(:to_json) ? content.data : JSON.parse(content.data)
         response.body << data.to_json
         content_type :json
-        set_action_headers
+        set_action_headers content.status
       end
 
-      def text
-        response.body << handler.data
+      def text(content)
+        response.body << content.data
         content_type :text
-        set_action_headers
+        set_action_headers content.status
       end
 
-      def download
-        send_file handler.data[:path], handler.data
+      def download(content)
+        send_file content.data[:path], content.data
       end
 
-      def handler_class_name
-        "#{TzString.camelize @handler_name}Handler"
-      end
+      class << self
 
-      def handler_class_file
-        "#{@domain.path}/api/#{@handler_name}.rb"
-      end
+        def handler_class_name(handler_name)
+          "#{TzString.camelize handler_name}Handler"
+        end
 
-      def handler_namespace
-        "#{TzString.camelize @domain.name }::Api"
-      end
+        def handler_class_file(domain, handler_name)
+          "#{domain.path}/api/#{handler_name}.rb"
+        end
 
-      def handler_class
-        @domain.require "api/#{@handler_name}"
-        TzString.constantize "#{handler_namespace}::#{handler_class_name}"
-      end
+        def handler_namespace(domain)
+          "#{TzString.camelize domain.name }::Api"
+        end
 
+        def handler_class(domain, handler_name)
+          domain.require "api/#{handler_name}"
+          TzString.constantize "#{handler_namespace domain}::#{handler_class_name handler_name}"
+        end
+
+      end
 
       private
 
-
-      def set_action_headers
+      def set_action_headers(status)
         response['X-API'] = "#{context.router_params[:sign]}:#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}"
-        response['X-API-STATE'] = "#{handler.status}"
+        response['X-API-STATE'] = "#{status}"
       end
 
     end
