@@ -77,16 +77,14 @@ module Tzispa
     end
 
     def load!
-      Mutex.new.synchronize {
+      self.class.synchronize {
         load_locales
-        @repository = Data::Repository.new(@config.repository.to_h).load! if @config.respond_to? :repository
-        @engine = Rig::Engine.new(self, @config.template_cache.enabled, @config.template_cache.size)
-        @logger = Logger.new("logs/#{@domain.name}.log", 'weekly')
-        @logger.level = @config.respond_to?(:developing) && @config.developing ? Logger::DEBUG : Logger::INFO
-        @domain.require_dir 'helpers'
-        @domain.require_dir 'services'
-        @domain.require_dir 'api'
-        @domain.require_dir 'middleware'
+        @repository = Data::Repository.new(config.repository.to_h).load! if config.respond_to? :repository
+        @engine = Rig::Engine.new(self, config.template_cache.enabled, config.template_cache.size)
+        @logger = Logger.new("logs/#{domain.name}.log", config.logging.shift_age).tap { |log|
+          log.level = config.developing ? Logger::DEBUG : Logger::INFO
+        } if config.logging&.enabled
+        domain_requires
         @loaded = true
       }
       self
@@ -97,6 +95,13 @@ module Tzispa
     end
 
     private
+
+    def domain_requires
+      domain.require_dir 'helpers'
+      domain.require_dir 'services'
+      domain.require_dir 'api'
+      domain.require_dir 'middleware'
+    end
 
     def load_locales
       if @config.respond_to?(:locales)
