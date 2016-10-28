@@ -125,6 +125,11 @@ module Tzispa
         end
       end
 
+      def path_sign?(sign, *args)
+        sign == sign_array(args, config.salt)
+      end
+
+
     end
 
   end
