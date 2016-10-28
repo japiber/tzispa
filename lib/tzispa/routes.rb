@@ -55,7 +55,7 @@ module Tzispa
     end
 
     def route_rig_signed_api(path, controller: nil, methods: nil)
-      routing :sapi, path, controller || 'signed_api:dispatch!', methods: methods
+      routing :sapi, path, controller || 'api:dispatch!', methods: methods
     end
 
     def route_rig_layout(layout, path, controller: nil, methods: nil)
