@@ -21,8 +21,8 @@ module Tzispa
       include Tzispa::Helpers::SignRequirer
       extend Forwardable
 
-      attr_reader :context, :status, :response_verb, :data
-      def_delegators :@context, :request, :response, :app, :repository
+      attr_reader :context, :response_verb, :data, :status
+      def_delegators :@context, :request, :response, :app, :repository, :config
 
       HANDLED_UNDEFINED         = nil
       HANDLED_OK                = 1
@@ -40,37 +40,38 @@ module Tzispa
         @context = context
       end
 
-      def result(response_verb:, status: HANDLED_UNDEFINED, data: nil, detailed_error: nil)
-        @status = status
+      def result(response_verb:, status: nil, data: nil, error: nil)
+        @status = status if status
         @response_verb = response_verb
         @data = data
-        @detailed_error = detailed_error
+        @error = error
       end
 
-      def result_json(status=HANDLED_UNDEFINED, data=nil, detailed_error=nil)
-        result response_verb: :json, status: status, data: data.to_json, detailed_error: detailed_error
+      def result_json(status: nil, data: nil, error: nil)
+        result response_verb: :json, status: status, data: data.to_json, error: error
       end
 
       def message
-        if @status.nil?
-          nil
-        elsif @status >= HANDLED_OK && @status <= HANDLED_ERROR
-          HANDLED_MESSAGES[@status]
-        elsif @status > HANDLED_ERROR && @status < HANDLED_RESULT
-          error_message @status
-        elsif @status > HANDLED_RESULT
-          result_messages @status
-        else
-          nil
+        case status
+        when status >= HANDLED_OK && status <= HANDLED_ERROR
+          HANDLED_MESSAGES[status]
+        when status > HANDLED_ERROR && status < HANDLED_RESULT
+          error_message status
+        when status > HANDLED_RESULT
+          result_messages status
         end
       end
 
       def call(verb, predicate=nil)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless provides? verb
         raise InvalidSign.new if sign_required? && !sign_valid?
-        # allow compound predicates
+        # process compound predicates
         args = predicate ? predicate.split(',') : nil
         send verb, *args
+      end
+
+      def set_status(value)
+        @status = value
       end
 
 
@@ -87,7 +88,7 @@ module Tzispa
       end
 
       def error_message(status)
-        "#{self.class::ERROR_MESSAGES[status]}#{': '+@detailed_error if @detailed_error}" if (defined?( self.class::ERROR_MESSAGES ) && self.class::ERROR_MESSAGES.is_a?(Hash))
+        "#{self.class::ERROR_MESSAGES[status]}#{': '+@error.to_s if @error}" if (defined?( self.class::ERROR_MESSAGES ) && self.class::ERROR_MESSAGES.is_a?(Hash))
       end
 
 
