@@ -104,7 +104,7 @@ module Tzispa
       private
 
       def set_api_headers(status)
-        response['X-API'] = "#{context.router_params[:sign]+"::" if context.router_params[:sign]}#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}"
+        response['X-API'] = "#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}"
         response['X-API-STATE'] = "#{status}"
       end
 
