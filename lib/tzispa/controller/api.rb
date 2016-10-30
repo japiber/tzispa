@@ -43,7 +43,6 @@ module Tzispa
         predicate = context.router_params[:predicate]
         handler = self.class.handler_class(domain, handler_name).new(context)
         handler.call verb, predicate
-        context.flash << handler.message
         send(handler.response_verb, handler) if handler.response_verb
         response.finish
       end
@@ -54,6 +53,7 @@ module Tzispa
         else
           request.referer
         end
+        context.flash << target.message if config.sessions&.enabled
         context.redirect url, config.absolute_redirects, response
       end
 
