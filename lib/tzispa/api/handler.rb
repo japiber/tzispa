@@ -40,24 +40,32 @@ module Tzispa
         @context = context
       end
 
-      def result(response_verb:, status: nil, data: nil, error: nil)
+      def result(response_verb:, data: nil, status: nil, error: nil)
         @status = status if status
         @response_verb = response_verb
         @data = data
         @error = error
       end
 
-      def result_json(status: nil, data: nil, error: nil)
-        result response_verb: :json, status: status, data: data.to_json, error: error
+      def result_json(data, status: nil)
+        result response_verb: :json, data: data.to_json, status: status
+      end
+
+      def result_download(data, status: nil)
+        result response_verb: :download, data: data, status: status
+      end
+
+      def not_found
+        result response_verb: :not_found
       end
 
       def message
-        case status
-        when status >= HANDLED_OK && status <= HANDLED_ERROR
+        case ss = status.to_i
+        when ss >= HANDLED_OK && ss <= HANDLED_ERROR
           HANDLED_MESSAGES[status]
-        when status > HANDLED_ERROR && status < HANDLED_RESULT
+        when ss > HANDLED_ERROR && ss < HANDLED_RESULT
           error_message status
-        when status > HANDLED_RESULT
+        when ss > HANDLED_RESULT
           result_messages status
         end
       end
