@@ -2,6 +2,13 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.11
+- moved app config files location
+- moved app locales base dir
+- api sign checking has been moved to handlers by helpers dsl
+- api dispatch code improvement and fixes
+- code reorganization to expose better interfaces
+
 ## v0.5.10
 - fix: check if the given layout is the default_layout in config before promote into the path params hash
 - add tmp folder in the project creation cli command
@@ -18,7 +25,7 @@ General purpose web framework
 - add path building methods for rig layouts in lib/tzispa/http/context.rb
 
 ## v0.5.7
-- add provides DSL method to specify allowe verbs in api handlers
+- add provides DSL method to specify allowed verbs in api handlers
 - handler calling improvements in api the controller
 
 ## v0.5.6

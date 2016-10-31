@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Tzispa
-  VERSION = '0.5.10'
+  VERSION = '0.5.11'
   FRAMEWORK_NAME = 'Tzispa'
   GEM_NAME = 'tzispa'
 end
