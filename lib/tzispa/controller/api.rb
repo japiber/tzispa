@@ -58,21 +58,21 @@ module Tzispa
       end
 
       def html(content)
-        response.body << content.data
         content_type :htm
+        response.body << content.data
         set_api_headers content.status
       end
 
       def json(content)
-        data = content.data.respond_to?(:to_json) ? content.data : JSON.parse(content.data)
-        response.body << data.to_json
         content_type :json
+        data = ::Hash === content.data || ::Array === content.data ? content.data : JSON.parse(content.data)
+        response.body << data.to_json
         set_api_headers content.status
       end
 
       def text(content)
-        response.body << content.data
         content_type :text
+        response.body << content.data
         set_api_headers content.status
       end
 
@@ -105,7 +105,7 @@ module Tzispa
 
       def set_api_headers(status)
         response['X-API'] = "#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}"
-        response['X-API-STATE'] = "#{status}"
+        response['X-API-STATE'] = "#{status.to_i}"
       end
 
     end
