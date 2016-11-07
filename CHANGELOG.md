@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.12
+- minor bug fixes
+- added new class run method to improve DSL usage
+
 ## v0.5.11
 - moved app config files location
 - moved app locales base dir
