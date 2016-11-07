@@ -59,7 +59,7 @@ module Tzispa
     end
 
     def route_rig_layout(layout, path, controller: nil, methods: nil)
-      routing layout.to_sym, path, controller || 'layout:render!', methods: methods, matching: {layout: layout.to_s}
+      routing layout, path, controller || 'layout:render!', methods: methods, matching: {layout: layout.to_s}
     end
 
   end
