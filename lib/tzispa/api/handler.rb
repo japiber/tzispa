@@ -47,8 +47,8 @@ module Tzispa
         @error = error
       end
 
-      def result_json(data, status: nil)
-        result response_verb: :json, data: data.to_json, status: status
+      def result_json(data, status: nil, error: nil)
+        result response_verb: :json, data: data, status: status, error: error
       end
 
       def result_download(data, status: nil)
