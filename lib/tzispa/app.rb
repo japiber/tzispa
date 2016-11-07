@@ -53,6 +53,11 @@ module Tzispa
         end
       end
 
+      def run(domain_name, builder: nil, on: nil, &block)
+        theapp = self.new domain_name, on: on, &block
+        theapp.run builder
+      end
+
     end
 
     def initialize(domain_name, on: nil, &block)
