@@ -105,7 +105,7 @@ module Tzispa
 
       def create_start
         File.open("#{name}/#{START_FILE}","w") do |f|
-          f.puts "require 'rack'\nrequire 'tzispa'"
+          f.puts "require 'tzispa'\n\n"
         end
       end
 
