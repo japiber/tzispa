@@ -34,10 +34,10 @@ module Tzispa
         @config ||= Tzispa::Config::Yaml.load(filename)
       end
 
-      def create_default(host:, layout: 'index', locale: 'en')
+      def create_default(host:, default_layout: 'index', locale: 'en')
         hcfg = Hash.new.tap { |cfg|
           cfg['id'] = domain.name
-          cfg['default_layout'] = layout
+          cfg['default_layout'] = default_layout
           cfg['default_format'] = 'htm'
           cfg['host_name'] = host
           cfg['canonical_url'] = "http://#{host}"
@@ -45,9 +45,14 @@ module Tzispa
           cfg['auth_required'] = false
           cfg['salt'] = secret(24)
           cfg['secret'] = secret(36)
+          cfg['temp_dir'] = 'tmp'
           cfg['locales'] = Hash.new.tap { |loc|
             loc['preload'] = true
             loc['default'] = locale
+          }
+          cfg['logging'] = Hash.new.tap { |log|
+            log['enabled'] = true
+            log['shift_age'] = 'daily'
           }
           cfg['sessions'] = Hash.new.tap { |ses|
             ses['enabled'] = true
