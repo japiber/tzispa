@@ -12,10 +12,10 @@ module Tzispa
 
       APP_STRUCTURE = [
         'api',
-        'config',
-        'config/locales',
+        'locales',
         'error',
         'helpers',
+        'middleware',
         'rig',
         'rig/block',
         'rig/layout',
@@ -53,22 +53,19 @@ module Tzispa
       def create_class(mount_path=nil)
         mount_path ||= DEFAULT_MOUNT_PATH
         File.open("#{Project::START_FILE}","a") do |f|
-          f.puts new_app_code(mount_path)
+          f.puts write_app_code(mount_path)
         end
       end
 
-      def new_app_code(mount_path)
+      def write_app_code(mount_path)
         Tzispa::Utils::Indenter.new(2).tap { |code|
-          code << "\nclass #{app_class_name} < Tzispa::Application; end\n\n"
-          code << "my_app = #{app_class_name}.new(#{domain.name}, on: '#{mount_path}')  do\n\n"
-          code.indent << "route_rig_signed_api  '/__api_:sign/:handler/:verb(~:predicate)(/:sufix)'"
-          code.indent << "route_rig_api         '/api/:handler/:verb(~:predicate)(/:sufix)'"
-          code.indent << "route_rig_index       '/'"
+          code << "(#{app_class_name} = Class.new Tzispa::Application).run :#{domain.name}, builder: self#{", on: \'"+mount_path+"\'" if mount_path && mount_path.length > 0}  do\n\n"
+          code.indent << "route_rig_signed_api  '/api_:sign/:handler/:verb(~:predicate)(/:sufix)'\n"
+          code        << "route_rig_api         '/api/:handler/:verb(~:predicate)(/:sufix)'\n"
+          code        << "route_rig_index       '/'\n\n"
           code.unindent << "end\n\n"
-          code << "my_app.run self"
         }.to_s
       end
-
 
       def create_structure
         unless File.exist? domain.path
