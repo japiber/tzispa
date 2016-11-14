@@ -58,6 +58,7 @@ module Tzispa
       end
 
       def write_app_code(mount_path)
+        mount_path = "/#{mount_path}" unless mount_path.start_with? '/'
         Tzispa::Utils::Indenter.new(2).tap { |code|
           code << "(#{app_class_name} = Class.new Tzispa::Application).run :#{domain.name}, builder: self#{", on: \'"+mount_path+"\'" if mount_path && mount_path.length > 0}  do\n\n"
           code.indent << "route_rig_signed_api  '/api_:sign/:handler/:verb(~:predicate)(/:sufix)'\n"
