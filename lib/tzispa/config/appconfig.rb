@@ -36,6 +36,7 @@ module Tzispa
 
       def create_default(host:, default_layout: 'index', locale: 'en')
         hcfg = Hash.new.tap { |cfg|
+          cfg['developing'] = true
           cfg['id'] = domain.name
           cfg['default_layout'] = default_layout
           cfg['default_format'] = 'htm'
@@ -43,9 +44,15 @@ module Tzispa
           cfg['canonical_url'] = "http://#{host}"
           cfg['default_encoding'] = 'utf-8'
           cfg['auth_required'] = false
+          cfg['absolute_redirects'] = true
           cfg['salt'] = secret(24)
           cfg['secret'] = secret(36)
           cfg['temp_dir'] = 'tmp'
+          cfg['temp_dir'] = true
+          cfg['template_cache'] = Hash.new.tap { |tpc|
+            tpc['enabled'] = false
+            tpc['size'] = 0
+          }
           cfg['locales'] = Hash.new.tap { |loc|
             loc['preload'] = true
             loc['default'] = locale
