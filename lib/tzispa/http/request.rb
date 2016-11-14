@@ -17,7 +17,7 @@ module Tzispa
         end
 
         def forwarded?
-          @env.include? "HTTP_X_FORWARDED_HOST"
+          env.include? "HTTP_X_FORWARDED_HOST"
         end
 
         def safe?
