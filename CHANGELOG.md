@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.13
+- update code creation templates in cli to reflect DSL changes
+- remove not used gem dependencies
+- bug fixes
+
 ## v0.5.12
 - minor bug fixes
 - added new class run method to improve DSL usage
