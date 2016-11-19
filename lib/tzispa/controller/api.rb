@@ -15,26 +15,9 @@ module Tzispa
 
     class Api < Base
 
+      using Tzispa::Utils
+
       include Tzispa::Helpers::Response
-
-
-      def self.generate_handler(domain, name)
-        raise "The handler '#{name}' already exist" if File.exist?(handler_class_file)
-        File.open(handler_class_file(domain, name), "w") { |f|
-          handler_code = TzString.new
-          f.puts handler_code.indenter("require 'tzispa/api/handler'\n\n")
-          level = 0
-          handler_namespace.split('::').each { |ns|
-            f.puts handler_code.indenter("module #{ns}\n", level > 0 ? 2 : 0).to_s
-            level += 1
-          }
-          f.puts handler_code.indenter("\nclass #{handler_class_name} < Tzispa::Api::Handler\n\n", 2)
-          f.puts handler_code.indenter("end\n\n")
-          handler_namespace.split('::').each { |ns|
-            f.puts handler_code.unindenter("end\n", 2)
-          }
-        }
-      end
 
       def dispatch!
         handler_name, domain_name = context.router_params[:handler].split('.').reverse
@@ -83,7 +66,7 @@ module Tzispa
       class << self
 
         def handler_class_name(handler_name)
-          "#{TzString.camelize handler_name}Handler"
+          "#{handler_name.camelize}Handler"
         end
 
         def handler_class_file(domain, handler_name)
@@ -91,12 +74,30 @@ module Tzispa
         end
 
         def handler_namespace(domain)
-          "#{TzString.camelize domain.name }::Api"
+          "#{domain.name.to_s.camelize}::Api"
         end
 
         def handler_class(domain, handler_name)
           domain.require "api/#{handler_name}"
-          TzString.constantize "#{handler_namespace domain}::#{handler_class_name handler_name}"
+          "#{handler_namespace domain}::#{handler_class_name handler_name}".constantize
+        end
+
+        def generate_handler(domain, name)
+          raise "The handler '#{name}' already exist" if File.exist?(handler_class_file)
+          File.open(handler_class_file(domain, name), "w") { |f|
+            handler_code = String.new
+            f.puts handler_code.indenter("require 'tzispa/api/handler'\n\n")
+            level = 0
+            handler_namespace.split('::').each { |ns|
+              f.puts handler_code.indenter("module #{ns}\n", level > 0 ? 2 : 0).to_s
+              level += 1
+            }
+            f.puts handler_code.indenter("\nclass #{handler_class_name} < Tzispa::Api::Handler\n\n", 2)
+            f.puts handler_code.indenter("end\n\n")
+            handler_namespace.split('::').each { |ns|
+              f.puts handler_code.unindenter("end\n", 2)
+            }
+          }
         end
 
       end

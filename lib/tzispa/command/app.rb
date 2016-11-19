@@ -10,6 +10,8 @@ module Tzispa
 
     class App
 
+      using Tzispa::Utils
+
       APP_STRUCTURE = [
         'api',
         'locales',
@@ -40,7 +42,7 @@ module Tzispa
       private
 
       def app_class_name
-        @app_class_name ||= "#{TzString.camelize domain.name}App"
+        @app_class_name ||= "#{domain.name.camelize}App"
       end
 
       def update_project

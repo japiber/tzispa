@@ -10,6 +10,8 @@ module Tzispa
 
   class Routes
 
+    using Tzispa::Utils
+
     CONTROLLERS_BASE = 'Tzispa::Controller'
 
     attr_reader :router, :map_path
@@ -29,7 +31,7 @@ module Tzispa
       spec_control, callmethod = controller.to_s.split(':')
       mpath = spec_control.split('#')
       req_controller = mpath.pop
-      controller = TzString.camelize(req_controller).to_s
+      controller = req_controller.camelize
       if mpath.count > 1
         controller_module = mpath.collect!{ |w| w.capitalize }.join('::')
         require_relative "./controller/#{req_controller}"
@@ -38,7 +40,7 @@ module Tzispa
         require "tzispa/controller/#{req_controller}"
       end
       @router.add(path).tap { |rule|
-        rule.to TzString.constantize("#{controller_module}::#{controller}").new(@app, callmethod)
+        rule.to "#{controller_module}::#{controller}".constantize.new(@app, callmethod)
         rule.name = route_id
         rule.add_request_method(methods) if methods
         rule.add_match_with(matching) if matching
