@@ -2,6 +2,7 @@
 
 require 'forwardable'
 require 'json'
+require 'i18n'
 require 'tzispa/helpers/provider'
 require 'tzispa/helpers/sign_requirer'
 require 'tzispa/utils/string'
