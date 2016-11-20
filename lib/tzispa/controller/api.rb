@@ -52,7 +52,7 @@ module Tzispa
         content_type :json
         data = ::String === handler.data ? JSON.parse(handler.data) : handler.data.to_json
         response.body << data
-        response.body << {__msg_error: handler.message}.to_json if handler.error?
+        response.body << Hash[:__error, true, :__msg_error, handler.message].to_json if handler.error?
         set_api_headers handler.status
       end
 
