@@ -4,6 +4,7 @@ require 'forwardable'
 require 'json'
 require 'tzispa/helpers/provider'
 require 'tzispa/helpers/sign_requirer'
+require 'tzispa/utils/string'
 
 module Tzispa
   module Api
@@ -21,34 +22,32 @@ module Tzispa
       include Tzispa::Helpers::SignRequirer
       extend Forwardable
 
+      using Tzispa::Utils
+
       attr_reader :context, :response_verb, :data, :status
       def_delegators :@context, :request, :response, :app, :repository, :config
 
-      HANDLED_UNDEFINED         = nil
-      HANDLED_OK                = 1
-      HANDLED_MISSING_PARAMETER = 98
-      HANDLED_ERROR             = 99
-      HANDLED_RESULT            = 200
+      HANDLER_STATUS_UNDEFINED  = nil
+      HANDLER_STATUS_OK         = :ok
+      HANDLER_MISSING_PARAMETER = :missing_parameter
 
-      HANDLED_MESSAGES = {
-        HANDLED_OK                => 'La operación se ha realizado correctamente',
-        HANDLED_MISSING_PARAMETER => 'Error: faltan parámetros para realizar la operación',
-        HANDLED_ERROR             => 'Error indeterminado: la operación no se ha podido realizar'
-      }
 
       def initialize(context)
         @context = context
       end
 
-      def result(response_verb:, data: nil, status: nil, error: nil)
-        @status = status if status
+      def result(response_verb:, data: nil, status: HANDLER_STATUS_UNDEFINED)
         @response_verb = response_verb
+        @status = status if status
         @data = data
-        @error = error
       end
 
-      def result_json(data, status: nil, error: nil)
-        result response_verb: :json, data: data, status: status, error: error
+      def error?
+        status && status != HANDLER_STATUS_OK
+      end
+
+      def result_json(data, status: nil)
+        result response_verb: :json, data: data, status: status
       end
 
       def result_download(data, status: nil)
@@ -60,17 +59,10 @@ module Tzispa
       end
 
       def message
-        case ss = status.to_i
-        when ss >= HANDLED_OK && ss <= HANDLED_ERROR
-          HANDLED_MESSAGES[status]
-        when ss > HANDLED_ERROR && ss < HANDLED_RESULT
-          error_message status
-        when ss > HANDLED_RESULT
-          result_messages status
-        end
+        I18n.t("#{self.class.name.dottize}.#{status}ss", default: "#{status}") if status
       end
 
-      def call(verb, predicate=nil)
+      def run!(verb, predicate=nil)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless provides? verb
         raise InvalidSign.new if sign_required? && !sign_valid?
         # process compound predicates
@@ -82,21 +74,10 @@ module Tzispa
         @status = value
       end
 
-
       protected
 
       def static_path_sign?
         context.path_sign? context.router_params[:sign], context.router_params[:handler], context.router_params[:verb], context.router_params[:predicate]
-      end
-
-      private
-
-      def result_messages(status)
-        self.class::RESULT_MESSAGES[status] if (defined?( self.class::RESULT_MESSAGES ) && self.class::RESULT_MESSAGES.is_a?(Hash))
-      end
-
-      def error_message(status)
-        "#{self.class::ERROR_MESSAGES[status]}#{': '+@error.to_s if @error}" if (defined?( self.class::ERROR_MESSAGES ) && self.class::ERROR_MESSAGES.is_a?(Hash))
       end
 
 

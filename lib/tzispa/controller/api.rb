@@ -25,42 +25,46 @@ module Tzispa
         verb = context.router_params[:verb]
         predicate = context.router_params[:predicate]
         handler = self.class.handler_class(domain, handler_name).new(context)
-        handler.call verb, predicate
+        handler.run! verb, predicate
         send(handler.response_verb, handler) if handler.response_verb
         response.finish
       end
 
-      def redirect(target)
-        url = if target.data && !target.data.strip.empty?
-          target.data.start_with?('#') ? "#{request.referer}#{target.data}" : target.data
+      def redirect(handler)
+        url = if handler.data && !handler.data.strip.empty?
+          handler.data.start_with?('#') ? "#{request.referer}#{handler.data}" : handler.data
         else
           request.referer
         end
-        context.flash << target.message if config.sessions&.enabled
+        puts "#{handler.error?} -> #{handler.message}"
+        context.flash << handler.message if config.sessions&.enabled && handler.error?
         context.redirect url, config.absolute_redirects, response
       end
 
-      def html(content)
+      def html(handler)
         content_type :htm
-        response.body << content.data
-        set_api_headers content.status
+        context.flash << handler.message if config.sessions&.enabled && handler.error?
+        response.body << handler.data
+        set_api_headers handler.status
       end
 
-      def json(content)
+      def json(handler)
         content_type :json
-        data = ::Hash === content.data || ::Array === content.data ? content.data : JSON.parse(content.data)
-        response.body << data.to_json
-        set_api_headers content.status
+        data = ::String === handler.data ? JSON.parse(handler.data) : handler.data.to_json
+        response.body << data
+        response.body << {__msg_error: handler.message}.to_json if handler.error?
+        set_api_headers handler.status
       end
 
-      def text(content)
+      def text(handler)
         content_type :text
-        response.body << content.data
-        set_api_headers content.status
+        context.flash << handler.message if config.sessions&.enabled && handler.error?
+        response.body << handler.data
+        set_api_headers handler.status
       end
 
-      def download(content)
-        send_file content.data[:path], content.data
+      def download(handler)
+        send_file handler.data[:path], handler.data
       end
 
       class << self
@@ -106,7 +110,7 @@ module Tzispa
 
       def set_api_headers(status)
         response['X-API'] = "#{context.router_params[:handler]}:#{context.router_params[:verb]}:#{context.router_params[:predicate]}"
-        response['X-API-STATE'] = "#{status.to_i}"
+        response['X-API-STATE'] = "#{status}"
       end
 
     end
