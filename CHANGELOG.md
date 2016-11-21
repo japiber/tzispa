@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.14
+- populate json response when there are handler errros
+- api error messages now managed by i18n files
+- code fixes for replacing TzString with String refinement
+
 ## v0.5.13
 - update code creation templates in cli to reflect DSL changes
 - remove not used gem dependencies
