@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.15
+- add thor gem missing dependency in gemspec
+
 ## v0.5.14
 - populate json response when there are handler errros
 - api error messages now managed by i18n files

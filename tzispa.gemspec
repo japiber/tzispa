@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rack',           '~> 2.0',    '>= 2.0.1'
   s.add_dependency 'i18n',           '~> 0.7.0'
+  s.add_dependency 'thor',           '~> 0.19.0'
   s.add_dependency 'http_router',    '~> 0.11.2'
   s.add_dependency 'tzispa_helpers', '~> 0.2'
   s.add_dependency 'tzispa_utils',   '~> 0.2'
