@@ -60,7 +60,7 @@ module Tzispa
       end
 
       def message
-        I18n.t("#{self.class.name.dottize}.#{status}ss", default: "#{status}") if status
+        I18n.t("#{self.class.name.dottize}.#{status}", default: "#{status}") if status
       end
 
       def run!(verb, predicate=nil)
