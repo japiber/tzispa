@@ -54,7 +54,7 @@ module Tzispa
         unless handler.error?
           response.body << data
         else
-          response.body << Hash[:__error, true, :__msg_error, handler.message].to_json
+          response.body << Hash[:__error, true, :__error_msg, handler.message, :__error_code, handler.status].to_json
         end
         set_api_headers handler.status
       end
