@@ -35,8 +35,7 @@ module Tzispa
           handler.data.start_with?('#') ? "#{request.referer}#{handler.data}" : handler.data
         else
           request.referer
-        end
-        puts "#{handler.error?} -> #{handler.message}"
+        end        
         context.flash << handler.message if config.sessions&.enabled && handler.error?
         context.redirect url, config.absolute_redirects, response
       end
