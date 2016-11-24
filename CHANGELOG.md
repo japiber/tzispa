@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.17
+- remove debug puts
+
 ## v0.5.16
 - controller/api: not populate body with the handler data if error? at json response
 - api/handler: fix i18n key in api handler error message builder
