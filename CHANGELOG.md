@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.5.16
+- controller/api: not populate body with the handler data if error? at json response
+- api/handler: fix i18n key in api handler error message builder
+- controller/api: add handler error status in the json response when error
+
 ## v0.5.15
 - add thor gem missing dependency in gemspec
 
