@@ -30,6 +30,14 @@ module Tzispa
 
     class << self
 
+      alias :__new__ :new
+
+      def new(*args, &block)
+        __new__(*args, &block).tap { |app|
+          add app
+        }
+      end
+
       def applications
         synchronize do
           @@applications ||= Hash.new{ |hash, key| raise UnknownApplication.new("#{key}") }
@@ -53,19 +61,18 @@ module Tzispa
         end
       end
 
-      def run(domain_name, builder: nil, on: nil, &block)
-        theapp = self.new domain_name, on: on, &block
+      def run(appid, builder: nil, on: nil, &block)
+        theapp = self.new appid, on: on, &block
         theapp.run builder
       end
 
     end
 
-    def initialize(domain_name, on: nil, &block)
-      @domain = Domain.new(domain_name)
+    def initialize(appid, on: nil, &block)
+      @domain = Domain.new(appid)
       @config = Config::AppConfig.new(@domain).load!
       @middleware = Middleware.new self
       @routes ||= Routes.new(self, on)
-      self.class.add(self)
       instance_eval(&block) if block
     end
 
@@ -109,9 +116,9 @@ module Tzispa
     end
 
     def load_locales
-      if @config.respond_to?(:locales)
+      if config.respond_to?(:locales)
         I18n.load_path = Dir["config/locales/*.yml"]
-        I18n.load_path += Dir["#{@domain.path}/locales/*.yml"]
+        I18n.load_path += Dir["#{domain.path}/locales/*.yml"]
       end
     end
 
