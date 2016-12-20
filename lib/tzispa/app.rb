@@ -8,7 +8,6 @@ require 'tzispa/routes'
 require 'tzispa/config/appconfig'
 require 'tzispa/middleware'
 require 'tzispa_data'
-require "tzispa_rig"
 
 
 module Tzispa
@@ -92,7 +91,6 @@ module Tzispa
       self.class.synchronize {
         load_locales
         @repository = Data::Repository.new(config.repository.to_h).load! if config.respond_to? :repository
-        @engine = Rig::Engine.new(self, config.template_cache.enabled, config.template_cache.size)
         @logger = Logger.new("logs/#{domain.name}.log", config.logging.shift_age).tap { |log|
           log.level = config.developing ? Logger::DEBUG : Logger::INFO
         } if config.logging&.enabled
@@ -117,8 +115,7 @@ module Tzispa
 
     def load_locales
       if config.respond_to?(:locales)
-        I18n.load_path = Dir["config/locales/*.yml"]
-        I18n.load_path += Dir["#{domain.path}/locales/*.yml"]
+        I18n.load_path += Dir["config/locales/*.yml", "#{domain.path}/locales/*.yml"]
       end
     end
 
