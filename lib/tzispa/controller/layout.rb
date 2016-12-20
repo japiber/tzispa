@@ -4,6 +4,7 @@ require 'tzispa_rig'
 require 'tzispa/controller/base'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
+require 'tzispa_rig'
 
 module Tzispa
   module Controller
@@ -12,10 +13,9 @@ module Tzispa
       include Tzispa::Helpers::Response
 
       def render!
-        layout_format = context.router_params[:format] || context.config.default_format
-        rig = context.app.engine.layout(name: layout_name, format: layout_format.to_sym)
+        rig = Tzispa::Rig::Engine.layout(name: layout_name, domain: application.domain)
         response.body << rig.render(context)
-        content_type layout_format
+        content_type context.router_params[:format] || context.config.default_format
       end
 
       private
