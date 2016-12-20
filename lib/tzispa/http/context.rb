@@ -91,12 +91,12 @@ module Tzispa
 
       def layout_path(layout, params={})
         params = params.merge(layout: layout) unless app.config.default_layout&.to_sym == layout
-        app.routes.path layout, params
+        app.routes.path layout, normalize_format(params)
       end
 
       def app_layout_path(app_name, layout, params={})
         params = params.merge(layout: layout) unless app[app_name].config.default_layout&.to_sym == layout
-        app[app_name].routes.path layout, params
+        app[app_name].routes.path layout, normalize_format(params)
       end
 
       def layout_canonical_url(layout, params={})
@@ -129,8 +129,14 @@ module Tzispa
         sign == sign_array(args, config.salt)
       end
 
+      private
+
+      def normalize_format(params)
+        params.tap { |pmm|
+          pmm[:format] = config.default_format unless pmm[:format]
+        }
+      end
 
     end
-
   end
 end
