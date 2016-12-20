@@ -9,13 +9,12 @@ require 'tzispa_rig'
 module Tzispa
   module Controller
     class Layout < Base
-
       include Tzispa::Helpers::Response
 
       def render!
-        rig = Tzispa::Rig::Engine.layout(name: layout_name, domain: application.domain)
+        rig = Tzispa::Rig::Engine.layout name: layout_name, domain: application.domain, content_type: context.router_params[:format] || config.default_format
         response.body << rig.render(context)
-        content_type context.router_params[:format] || context.config.default_format
+        content_type rig.content_type
       end
 
       private
