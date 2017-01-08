@@ -107,7 +107,7 @@ module Tzispa
         app[app_name].config.canonical_url + app_layout_path(app_name, layout, params)
       end
 
-      def api(handler, verb, predicate, sufix, app_name)
+      def api(handler, verb, predicate, sufix, app_name = nil)
         unless app_name
           canonical_url :api, handler: handler, verb: verb, predicate: predicate, sufix: sufix
         else
