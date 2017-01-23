@@ -107,6 +107,7 @@ module Tzispa
     private
 
     def domain_requires
+      domain.require_dir
       domain.require_dir 'helpers'
       domain.require_dir 'services'
       domain.require_dir 'api'
