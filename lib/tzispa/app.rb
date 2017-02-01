@@ -116,6 +116,7 @@ module Tzispa
 
     def load_locales
       if config.respond_to?(:locales)
+        I18n.enforce_available_locales = false
         I18n.load_path += Dir["config/locales/*.yml", "#{domain.path}/locales/*.yml"]
       end
     end
