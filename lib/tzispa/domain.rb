@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require 'tzispa/utils/string'
+
 module Tzispa
   class Domain
+
+    using Tzispa::Utils
 
     attr_reader :name, :root
 
@@ -40,6 +44,10 @@ module Tzispa
         name = file.split('/').last
         Kernel.load ".#{rqpath}/#{name}"
       }
+    end
+
+    def include(cmod)
+      name.to_s.capitalize.constantize.include cmod
     end
 
     def self.require(domain, file)

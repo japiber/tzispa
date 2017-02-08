@@ -90,11 +90,11 @@ module Tzispa
     def load!
       self.class.synchronize {
         load_locales
-        @repository = Data::Repository.new(config.repository.to_h).load! if config.respond_to? :repository
         @logger = Logger.new("logs/#{domain.name}.log", config.logging.shift_age).tap { |log|
           log.level = config.developing ? Logger::DEBUG : Logger::INFO
         } if config.logging&.enabled
-        domain_requires
+        domain_setup
+        @repository = Data::Repository.new(config.repository.to_h).load!(domain) if config.respond_to? :repository
         @loaded = true
       }
       self
@@ -106,7 +106,7 @@ module Tzispa
 
     private
 
-    def domain_requires
+    def domain_setup
       domain.require_dir
       domain.require_dir 'helpers'
       domain.require_dir 'services'

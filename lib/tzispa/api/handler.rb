@@ -26,7 +26,7 @@ module Tzispa
       using Tzispa::Utils
 
       attr_reader :context, :response_verb, :data, :status
-      def_delegators :@context, :request, :response, :app, :repository, :config
+      def_delegators :@context, :request, :response, :app, :repository, :config, :logger
 
       HANDLER_STATUS_UNDEFINED  = nil
       HANDLER_STATUS_OK         = :ok
