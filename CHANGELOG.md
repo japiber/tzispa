@@ -2,6 +2,13 @@ Tzispa
 
 General purpose web framework
 
+## v0.6.0
+- code refactoring & templates namespace simplification
+- added auth_layout controller
+- added context cache
+- added default format from config in layout url builders
+- removed per app rig engines
+
 ## v0.5.17
 - remove debug puts
 
