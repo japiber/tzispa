@@ -19,10 +19,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'i18n',           '~> 0.8.0'
   s.add_dependency 'thor',           '~> 0.19.0'
   s.add_dependency 'http_router',    '~> 0.11.2'
-  s.add_dependency 'tzispa_helpers', '~> 0.2'
-  s.add_dependency 'tzispa_utils',   '~> 0.2'
-  s.add_dependency 'tzispa_rig',     '~> 0.4.2'
-  s.add_dependency 'tzispa_data',    '~> 0.2.0'
+  s.add_dependency 'tzispa_helpers', '~> 0.2.2'
+  s.add_dependency 'tzispa_utils',   '~> 0.3'
+  s.add_dependency 'tzispa_rig',     '~> 0.5'
+  s.add_dependency 'tzispa_data',    '~> 0.3'
 
   s.files         = Dir.glob("{lib,bin}/**/*") + %w(README.md CHANGELOG.md LICENSE tzispa.gemspec)
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
