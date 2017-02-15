@@ -41,7 +41,8 @@ module Tzispa
           # currently, this would be the static file-handler
           headers["Content-Length"] = body.inject(0) { |l, p| l + p.bytesize }.to_s
         end
-        headers['X-Powered-By'] = "#{Tzispa::FRAMEWORK_NAME}"
+        headers['X-Frame-Options'] = 'SAMEORIGIN'
+        headers['X-Powered-By'] = "#{Tzispa::FRAMEWORK_NAME} #{Tzispa::VERSION}"        
         [status.to_i, headers, result]
       end
 
