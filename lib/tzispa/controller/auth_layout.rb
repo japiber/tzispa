@@ -12,7 +12,7 @@ module Tzispa
       include Tzispa::Helpers::Response
 
       def render!
-        if (layout_name == login_layout) || context.login
+        if (layout_name == login_layout) || context.logged?
           rig = Tzispa::Rig::Engine.layout name: layout_name, domain: application.domain, content_type: context.router_params[:format] || config.default_format
           response.body << rig.render(context)
           content_type rig.content_type

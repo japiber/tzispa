@@ -20,7 +20,7 @@ module Tzispa
         load!
       end
 
-      def << (value)
+      def <<(value)
         if not value.nil?
           @bag << value
           store

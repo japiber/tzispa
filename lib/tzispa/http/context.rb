@@ -17,9 +17,10 @@ module Tzispa
       include Tzispa::Helpers::Security
 
       attr_reader    :request, :response
-      def_delegators :@request, :session, :browser
+      def_delegators :@request, :session
 
       SESSION_LAST_ACCESS   = :__last_access
+      SESSION_ID            = :__session_id
       SESSION_AUTH_USER     = :__auth__user
       GLOBAL_MESSAGE_FLASH  = :__global_message_flash
 
@@ -28,7 +29,7 @@ module Tzispa
         super(app, environment)
         @request = Tzispa::Http::Request.new(environment)
         @response = Tzispa::Http::Response.new
-        session[:id] ||= SecureRandom.uuid if app&.config&.sessions&.enabled
+        generate_session_id unless session[SESSION_ID]
       end
 
       def router_params
@@ -48,15 +49,19 @@ module Tzispa
       end
 
       def flash
-        SessionFlashBag.new(session, GLOBAL_MESSAGE_FLASH)
+        @flash ||= SessionFlashBag.new(session, GLOBAL_MESSAGE_FLASH)
+      end
+
+      def session?
+        (not session[SESSION_ID].nil?) and (session[SESSION_ID] == session.id)
       end
 
       def logged?
-        not session[SESSION_AUTH_USER].nil?
+        session? and (not session[SESSION_AUTH_USER].nil?)
       end
 
       def login=(user)
-        session[SESSION_AUTH_USER] = user if not user.nil?
+        session[SESSION_AUTH_USER] = user unless user.nil?
       end
 
       def login
@@ -130,6 +135,13 @@ module Tzispa
       end
 
       private
+
+      def generate_session_id
+        SecureRandom.uuid.tap { |uuid|
+          session.id = uuid
+          session[SESSION_ID] = uuid
+        }
+      end
 
       def normalize_format(params)
         params.tap { |pmm|
