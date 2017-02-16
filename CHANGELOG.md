@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.6.1
+- sessions security improvements
+- added "x-frame-option: sameorigin" header to security improvement
+
 ## v0.6.0
 - code refactoring & templates namespace simplification
 - added auth_layout controller
