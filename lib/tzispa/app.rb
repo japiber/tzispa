@@ -4,9 +4,8 @@ require 'forwardable'
 require 'logger'
 require 'i18n'
 require 'tzispa/domain'
-require 'tzispa/routes'
+require 'tzispa/route_set'
 require 'tzispa/config/appconfig'
-require 'tzispa/middleware'
 require 'tzispa_data'
 
 
@@ -19,12 +18,10 @@ module Tzispa
   class Application
     extend Forwardable
 
-    attr_reader :domain, :config, :middleware, :repository, :engine,
-                :logger, :mount_path, :routes
+    attr_reader :domain, :config, :repository, :logger, :routes
 
-    def_delegator :@middleware, :use
     def_delegator :@domain, :name
-    def_delegators :@routes, :routing, :route_rig_index, :route_rig_api, :route_rig_signed_api, :route_rig_layout
+    def_delegators :@routes, :map_path, :routing, :index, :api, :signed_api, :layout
 
 
     class << self
@@ -60,44 +57,32 @@ module Tzispa
         end
       end
 
-      def run(appid, builder: nil, on: nil, &block)
-        theapp = self.new appid, on: on, &block
-        theapp.run builder
-      end
-
     end
 
     def initialize(appid, on: nil, &block)
       @domain = Domain.new(appid)
       @config = Config::AppConfig.new(@domain).load!
-      @middleware = Middleware.new self
-      @routes ||= Routes.new(self, on)
+      @routes = RouteSet.new(self, on)
+      @logger = Logger.new("logs/#{domain.name}.log", config.logging.shift_age).tap { |log|
+        log.level = config.developing ? Logger::DEBUG : Logger::INFO
+      } if config&.logging&.enabled
+      @repository = Data::Repository.new(config.repository.to_h) if config.respond_to? :repository
       instance_eval(&block) if block
     end
 
-    def run(builder=nil)
-      builder ||= ::Rack::Builder.new
-      if routes.map_path
-        this_app = self
-        builder.map routes.map_path do
-          run this_app.middleware.builder
-        end
-      else
-        builder.run middleware.builder
-      end
+    def call(env)
+      routes.call env
     end
 
     def load!
-      self.class.synchronize {
-        load_locales
-        @logger = Logger.new("logs/#{domain.name}.log", config.logging.shift_age).tap { |log|
-          log.level = config.developing ? Logger::DEBUG : Logger::INFO
-        } if config.logging&.enabled
-        domain_setup
-        @repository = Data::Repository.new(config.repository.to_h).load!(domain) if config.respond_to? :repository
-        @loaded = true
+      tap { |app|
+        app.class.synchronize {
+          load_locales
+          domain_setup
+          routes_setup
+          repository&.load!(domain)
+        }
       }
-      self
     end
 
     def [](domain)
@@ -112,6 +97,14 @@ module Tzispa
       domain.require_dir 'services'
       domain.require_dir 'api'
       domain.require_dir 'middleware'
+    end
+
+    def routes_setup
+      path = "config/routes/#{name}.rb"
+      routes.draw do
+        contents = File.read(path)
+        instance_eval(contents, File.basename(path), 0)
+      end
     end
 
     def load_locales
