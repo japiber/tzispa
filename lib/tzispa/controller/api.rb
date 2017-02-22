@@ -35,7 +35,7 @@ module Tzispa
           handler.data.start_with?('#') ? "#{request.referer}#{handler.data}" : handler.data
         else
           request.referer
-        end        
+        end
         context.flash << handler.message if config.sessions&.enabled && handler.error?
         context.redirect url, config.absolute_redirects, response
       end
@@ -50,10 +50,10 @@ module Tzispa
       def json(handler)
         content_type :json
         data = ::String === handler.data ? JSON.parse(handler.data) : handler.data.to_json
-        unless handler.error?
-          response.body << data
+        response.body << unless handler.error?
+          data
         else
-          response.body << Hash[:__error, true, :__error_msg, handler.message, :__error_code, handler.status].to_json
+          Hash[:__error, true, :__error_msg, handler.message, :__error_code, handler.status].to_json
         end
         set_api_headers handler.status
       end
