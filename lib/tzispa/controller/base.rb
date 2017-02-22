@@ -23,8 +23,6 @@ module Tzispa
 
       def call(env)
         @context = Tzispa::Http::Context.new(@application, env)
-        #env[Tzispa::ENV_TZISPA_CONTEXT] = @context
-        #@context = env[Tzispa::ENV_TZISPA_CONTEXT]
         invoke @callmethod if @callmethod
         response.finish
       end

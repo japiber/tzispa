@@ -8,12 +8,7 @@ require 'tzispa/route_set'
 require 'tzispa/config/appconfig'
 require 'tzispa_data'
 
-
 module Tzispa
-
-  ENV_TZISPA_APP     = :tzispa__app
-  ENV_TZISPA_CONTEXT = :tzispa__context
-
 
   class Application
     extend Forwardable
