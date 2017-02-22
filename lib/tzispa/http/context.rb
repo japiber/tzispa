@@ -29,7 +29,7 @@ module Tzispa
         super(app, environment)
         @request = Tzispa::Http::Request.new(environment)
         @response = Tzispa::Http::Response.new
-        generate_session_id unless session[SESSION_ID]
+        init_session
       end
 
       def router_params
@@ -86,30 +86,43 @@ module Tzispa
         app[app_name].routes.path path_id, params
       end
 
+      def canonical_root
+        @canonical_root ||= begin
+          http_proto = Tzispa::Environment.instance.ssl? ? 'https://' : 'http://'
+          http_host = Tzispa::Environment.instance.host
+          http_port = if Tzispa::Environment.instance.ssl?
+            ":#{Tzispa::Environment.instance.port}" unless Tzispa::Environment.instance.port == 443
+          else
+            ":#{Tzispa::Environment.instance.port}" unless Tzispa::Environment.instance.port == 80
+          end
+          "#{http_proto}#{http_host}#{http_port}"
+        end
+      end
+
       def canonical_url(path_id, params={})
-        app.config.canonical_url + path(path_id, params)
+        "#{canonical_root}#{path(path_id, params)}"
       end
 
       def app_canonical_url(app_name, path_id, params={})
-        app[app_name].config.canonical_url + app_path(app_name, path_id, params)
+        "#{canonical_root}#{app_path(app_name, path_id, params)}"
       end
 
       def layout_path(layout, params={})
-        params = params.merge(layout: layout) unless app.config.default_layout&.to_sym == layout
-        app.routes.path layout, normalize_format(params)
+        params = normalize_format(params.merge(layout: layout)) unless app.config.default_layout&.to_sym == layout
+        app.routes.path layout, params
       end
 
       def app_layout_path(app_name, layout, params={})
-        params = params.merge(layout: layout) unless app[app_name].config.default_layout&.to_sym == layout
-        app[app_name].routes.path layout, normalize_format(params)
+        params = normalize_format(params.merge(layout: layout)) unless app[app_name].config.default_layout&.to_sym == layout
+        app[app_name].routes.path layout, params
       end
 
       def layout_canonical_url(layout, params={})
-        app.config.canonical_url + layout_path(layout, params)
+        "#{canonical_root}#{layout_path(layout, params)}"
       end
 
       def app_layout_canonical_url(app_name, layout, params={})
-        app[app_name].config.canonical_url + app_layout_path(app_name, layout, params)
+        "#{canonical_root}#{app_layout_path(app_name, layout, params)}"
       end
 
       def api(handler, verb, predicate, sufix, app_name = nil)
@@ -132,6 +145,10 @@ module Tzispa
 
       def path_sign?(sign, *args)
         sign == sign_array(args, config.salt)
+      end
+
+      def init_session
+        generate_session_id if config&.sessions&.enabled and not session?
       end
 
       private
