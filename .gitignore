@@ -1,0 +1,14 @@
+.directory
+*.gem
+*.rbc
+.bundle
+.config
+Gemfile.lock
+test/tmp
+tmp
+*.bundle
+.DS_Store
+.tzisparc
+.rubocop.yml
+.rubocop_todo.yml
+
