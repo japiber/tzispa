@@ -2,6 +2,7 @@
 
 require 'forwardable'
 require 'tzispa/helpers/error_view'
+require 'tzispa/http/context'
 
 
 module Tzispa
