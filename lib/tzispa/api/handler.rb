@@ -19,14 +19,16 @@ module Tzispa
     class InvalidSign < ApiException; end
 
     class Handler
+      extend Forwardable
+
       include Tzispa::Helpers::Provider
       include Tzispa::Helpers::SignRequirer
-      extend Forwardable
 
       using Tzispa::Utils
 
       attr_reader :context, :response_verb, :data, :status
-      def_delegators :@context, :request, :response, :app, :repository, :config, :logger
+      def_delegators :@context, :request, :response, :app, :repository,
+                     :config, :logger, :unauthorized_but_logged
 
       HANDLER_STATUS_UNDEFINED  = nil
       HANDLER_STATUS_OK         = :ok
@@ -41,6 +43,17 @@ module Tzispa
         @response_verb = response_verb
         @status = status if status
         @data = data
+      end
+
+      class << self
+        def before(*args)
+          (@before_chain ||= []).tap do |bef|
+            args.each { |s|
+              s = s.to_sym
+              bef << s unless bef.include?(s)
+            }
+          end
+        end
       end
 
       def error?
@@ -66,6 +79,7 @@ module Tzispa
       def run!(verb, predicate=nil)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless provides? verb
         raise InvalidSign.new if sign_required? && !sign_valid?
+        do_before
         # process compound predicates
         args = predicate ? predicate.split(',') : nil
         send verb, *args
@@ -81,6 +95,9 @@ module Tzispa
         context.path_sign? context.router_params[:sign], context.router_params[:handler], context.router_params[:verb], context.router_params[:predicate]
       end
 
+      def do_before
+        self.class.before.each { |hbef| send hbef }
+      end
 
     end
   end
