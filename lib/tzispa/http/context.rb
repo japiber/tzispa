@@ -53,11 +53,11 @@ module Tzispa
       end
 
       def session?
-        (not session[SESSION_ID].nil?) and (session[SESSION_ID] == session.id)
+        !session[SESSION_ID].nil? && (session[SESSION_ID] == session.id)
       end
 
       def logged?
-        session? and (not session[SESSION_AUTH_USER].nil?)
+        session? && login
       end
 
       def login=(user)
@@ -75,6 +75,10 @@ module Tzispa
       def login_redirect
         login_layout = config.login_layout
         redirect(layout_path(login_layout.to_sym), true, response) unless logged? || (layout == login_layout)
+      end
+
+      def unauthorized_but_logged
+         not_authorized unless logged?
       end
 
       def error_500(str)
