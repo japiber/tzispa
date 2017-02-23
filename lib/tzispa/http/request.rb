@@ -5,13 +5,23 @@ require 'rack'
 
 module Tzispa
   module Http
+
     class Request < Rack::Request
+
+        ALLOWED_HTTP_VERSIONS = ['HTTP/1.1', 'HTTP/2.0'].freeze
 
         alias secure? ssl?
 
-
         def forwarded?
           env.include? "HTTP_X_FORWARDED_HOST"
+        end
+
+        def http_version
+          env['HTTP_VERSION']
+        end
+
+        def allowed_http_version?
+          ALLOWED_HTTP_VERSIONS.include? http_version
         end
 
         def safe?
