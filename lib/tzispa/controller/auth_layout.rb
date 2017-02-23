@@ -3,7 +3,6 @@
 require 'forwardable'
 require 'tzispa/controller/layout'
 
-
 module Tzispa
   module Controller
     class AuthLayout < Layout
