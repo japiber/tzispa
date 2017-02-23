@@ -25,9 +25,9 @@ module Tzispa
       GLOBAL_MESSAGE_FLASH  = :__global_message_flash
 
 
-      def initialize(app, environment)
-        super(app, environment)
-        @request = Tzispa::Http::Request.new(environment)
+      def initialize(app, env)
+        super(app, env)
+        @request = Tzispa::Http::Request.new(env)
         @response = Tzispa::Http::Response.new
         init_session
       end
@@ -70,6 +70,11 @@ module Tzispa
 
       def logout
         session.delete(SESSION_AUTH_USER)
+      end
+
+      def login_redirect
+        login_layout = config.login_layout
+        redirect(layout_path(login_layout.to_sym), true, response) unless logged? || (layout == login_layout)
       end
 
       def error_500(str)
