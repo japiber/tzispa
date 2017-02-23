@@ -4,7 +4,6 @@ require 'tzispa_rig'
 require 'tzispa/controller/base'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
-require 'tzispa_rig'
 
 module Tzispa
   module Controller
