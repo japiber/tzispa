@@ -27,30 +27,49 @@ module Tzispa
         response.finish
       end
 
+
+      class << self
+        def before(*args)
+          (@before_chain ||= []).tap { |bef|
+            args&.each { |s|
+              s = s.to_sym
+              bef << s unless bef.include?(s)
+            }
+          }
+        end
+      end
+
       private
 
       def invoke(callmethod)
-        debug_info = nil
-        status = catch(:halt) {
+        prepare_response catch(:halt) {
           begin
+            do_before
             send "#{@callmethod}"
           rescue Tzispa::Rig::NotFound => ex
             context.logger.info "#{ex.message} (#{ex.class})"
             404
           rescue StandardError, ScriptError => ex
             context.logger.error "#{ex.message} (#{ex.class}):\n #{ex.backtrace.join("\n\t") if ex.respond_to?(:backtrace) && ex.backtrace}"
-            debug_info = debug_info(ex) if config.developing
+            @debug_info = debug_info(ex) if config.developing
             500
           end
         }
+      end
+
+      def prepare_response(status)
         response.status = status if status.is_a?(Integer)
         if response.client_error?
           response.body = error_page(context.domain, status: response.status)
         elsif response.server_error?
-          response.body = debug_info ?
-            debug_info :
-            error_page(context.domain, status: response.status)
+          response.body = @debug_info || error_page(context.domain, status: response.status)
         end
+      end
+
+      def do_before
+        self.class.before.each { |hbef|
+          send hbef
+        }
       end
 
     end
