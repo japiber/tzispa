@@ -76,8 +76,8 @@ module Tzispa
         File.open("config/routes/#{domain.name}.rb", 'w') do |file|
           file.puts '# app routes definitions \n'
           file.puts "index       '/', controller: 'layout:render!'"
-          file.puts "signed_api  '/klapi_:sign/:handler/:verb(~:predicate)(/:sufix)'"
-          file.puts "api         '/klapi/:handler/:verb(~:predicate)(/:sufix)'"
+          file.puts "signed_api  '/api_:sign/:handler/:verb(~:predicate)(/:sufix)'"
+          file.puts "api         '/api/:handler/:verb(~:predicate)(/:sufix)'"
         end
       end
 
