@@ -28,7 +28,7 @@ module Tzispa
 
       attr_reader :context, :response_verb, :data, :status
       def_delegators :@context, :request, :response, :app, :repository,
-                     :config, :logger, :unauthorized_but_logged
+                     :config, :logger, :unauthorized_but_logged, :login_redirect
 
       HANDLER_STATUS_UNDEFINED  = nil
       HANDLER_STATUS_OK         = :ok
