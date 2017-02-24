@@ -11,6 +11,7 @@ module Tzispa
       puts "v#{VERSION}"
     end
 
+    require 'tzispa/commands/server'
     desc 'server', 'Start Tzispa app server'
     method_option :port, aliases: '-p', desc: 'The port to run the server on'
     method_option :server, desc: 'Choose a specific Rack::Handler (webrick, thin, etc)'
@@ -24,8 +25,19 @@ module Tzispa
       if options[:help]
         invoke :help, ['server']
       else
-        require 'tzispa/commands/server'
         Tzispa::Commands::Server.new(options).start
+      end
+    end
+
+    require 'tzispa/commands/console'
+    desc 'console', 'Starts a Tzispa console'
+    method_option :engine, desc: "Choose a specific console engine: (#{Tzispa::Commands::Console::ENGINES.keys.join('/')})"
+    method_option :help, desc: 'Displays the usage help'
+    def console
+      if options[:help]
+        invoke :help, ['console']
+      else
+        Tzispa::Commands::Console.new(options).start
       end
     end
 
