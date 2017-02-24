@@ -58,9 +58,9 @@ module Tzispa
       @domain = Domain.new(appid)
       @config = Config::AppConfig.new(@domain).load!
       @routes = RouteSet.new(self, on)
-      @logger = Logger.new("logs/#{domain.name}.log", config.logging.shift_age).tap { |log|
-        log.level = config.developing ? Logger::DEBUG : Logger::INFO
-      } if config&.logging&.enabled
+      @logger = Logger.new("logs/#{domain.name}.log", config.logging&.shift_age).tap { |log|
+        log.level = Tzispa::Environment.development? ? Logger::DEBUG : Logger::INFO
+      } if config.logging&.enabled
       @repository = Data::Repository.new(config.repository.to_h) if config.respond_to? :repository
       instance_eval(&block) if block
     end
