@@ -14,7 +14,8 @@ module Tzispa
       include Tzispa::Helpers::ErrorView
 
       attr_reader :context, :application
-      def_delegators :@context, :request, :response, :config
+      def_delegators :@context, :request, :response, :config,
+                     :login_redirect, :unauthorized_but_logged
 
       def initialize(app, callmethod=nil)
         @callmethod = callmethod
@@ -49,9 +50,9 @@ module Tzispa
           rescue Tzispa::Rig::NotFound => ex
             context.logger.info "#{ex.message} (#{ex.class})"
             404
-          rescue StandardError, ScriptError => ex
+          rescue StandardError, ScriptError, SecurityError => ex
             context.logger.error "#{ex.message} (#{ex.class}):\n #{ex.backtrace.join("\n\t") if ex.respond_to?(:backtrace) && ex.backtrace}"
-            @debug_info = debug_info(ex) if config.developing
+            @dinfo = debug_info(ex) if Tzispa::Environment.development?
             500
           end
         }
@@ -62,7 +63,7 @@ module Tzispa
         if response.client_error?
           response.body = error_page(context.domain, status: response.status)
         elsif response.server_error?
-          response.body = @debug_info || error_page(context.domain, status: response.status)
+          response.body = @dinfo || error_page(context.domain, status: response.status)
         end
       end
 
