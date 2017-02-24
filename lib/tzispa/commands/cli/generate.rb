@@ -17,12 +17,13 @@ module Tzispa
 
         require 'tzispa/commands/app'
         desc 'app', 'Generate new application into a project'
-        method_option :mount, :aliases => "-m", :desc => "The mount point for this app", :default => ""
-        method_option :host, :aliases => "-h", :desc => "The hostname used for this app ", :required => true
+        method_option :mount, :aliases => "-m", :desc => "The mount point for this app", :default => "/"
+        method_option :index, :aliases => "-i", :desc => "Default index layout", :default => "index"
+        method_option :locale, :aliases => "-l", :desc => "Default app locale", :default => "en"
         def app(name)
           require 'tzispa/commands/app'
           tzapp = Tzispa::Commands::App.new(name)
-          tzapp.generate(options[:host], options[:mount])
+          tzapp.generate(options[:mount], options[:index], options[:locale])
           puts "App '#{name}' has been created"
         end
 

@@ -49,7 +49,7 @@ module Tzispa
 
       def generate_projectrc
         rc = Tzisparc.new Pathname.new(Dir.pwd).join(name)
-        rc.generate name
+        rc.generate
       end
 
       def generate_environment
@@ -62,7 +62,6 @@ module Tzispa
         File.open("#{name}/#{Tzispa::Environment::DEFAULT_RACKUP}", 'w') do |file|
           file.puts "\# project #{name} started on #{Time.now}"
           file.puts "require_relative 'config/boot'\n"
-          file.puts "run Tzispa::Application.new(:#{name}).load!"
         end
       end
 
