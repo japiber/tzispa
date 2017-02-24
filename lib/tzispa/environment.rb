@@ -17,6 +17,8 @@ module Tzispa
 
     TZISPA_ENV      = 'TZISPA_ENV'.freeze
 
+    DEVELOPMENT_ENV = 'development'.freeze
+
     DEFAULT_ENV    = 'development'.freeze
 
     PRODUCTION_ENV = 'production'.freeze
@@ -73,12 +75,20 @@ module Tzispa
       instance[key]
     end
 
+    def self.development?
+      instance.development?
+    end
+
     def [](key)
       @env[key]
     end
 
     def environment
       @environment ||= env[TZISPA_ENV] || rack_env || DEFAULT_ENV
+    end
+
+    def development?
+      environment == DEVELOPMENT_ENV
     end
 
     def environment?(*names)
