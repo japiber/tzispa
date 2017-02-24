@@ -42,11 +42,33 @@ module Tzispa
           headers["Content-Length"] = body.inject(0) { |l, p| l + p.bytesize }.to_s
         end
         headers['X-Frame-Options'] = 'SAMEORIGIN'
-        headers['X-Powered-By'] = "#{Tzispa::FRAMEWORK_NAME} #{Tzispa::VERSION}"        
+        headers['X-Powered-By'] = "#{Tzispa::FRAMEWORK_NAME} #{Tzispa::VERSION}"
         [status.to_i, headers, result]
       end
 
-      private
+      def cache_control
+        headers['Cache-control']
+      end
+
+      def cache_private
+        add_cache_control "private"
+        self
+      end
+
+      def no_store
+        add_cache_control "no-store"
+        self
+      end
+
+      def no_cache
+        add_cache_control "no-cache"
+        self
+      end
+
+      def must_revalidate
+        add_cache_control "must-revalidate"
+        self
+      end
 
       def calculate_content_length?
         headers["Content-Type"] and not headers["Content-Length"] and Array === body
@@ -60,7 +82,15 @@ module Tzispa
         DROP_BODY_RESPONSES.include?(status.to_i)
       end
 
-    end
+      private
 
+      def add_cache_control(policy)
+        acache = (cache_control || String.new).split(',').map(&:strip)
+        acache << policy unless acache.include?(policy)
+        headers['Cache-control'] = acache.join(', ')
+      end
+
+
+    end
   end
 end
