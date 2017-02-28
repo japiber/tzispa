@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'tzispa/domain'
 require 'tzispa/utils/string'
@@ -12,9 +14,11 @@ module Tzispa
       using Tzispa::Utils
 
       APP_STRUCTURE = [
-        'api', 'locales', 'error', 'helpers', 'view', 'view/_',
+        'api', 'locales', 'error', 'controller', 'helpers', 'view', 'view/_',
         'view/_/block', 'view/_/layout', 'view/_/static', 'services'
-      ]
+      ].freeze
+
+      NO_PROJECT_FOLDER = 'You must be located in a Tzispa project folder to generate new apps'
 
       attr_reader :domain
 
@@ -23,7 +27,7 @@ module Tzispa
       end
 
       def generate(mount_path, index_layout, locale)
-        raise 'You must be located in a Tzispa project folder to generate new apps' unless project_folder?
+        raise NO_PROJECT_FOLDER unless project_folder?
         update_rackup mount_path
         create_structure
         create_appconfig index_layout, locale
@@ -37,7 +41,7 @@ module Tzispa
         File.exist?(Tzispa::Environment::DEFAULT_RACKUP)
       end
 
-      def update_rackup(mount_path=nil)
+      def update_rackup(mount_path = nil)
         mount_path ||= DEFAULT_MOUNT_PATH
         File.open(Tzispa::Environment::DEFAULT_RACKUP, 'a') do |f|
           f.puts write_app_code(mount_path)
@@ -46,20 +50,17 @@ module Tzispa
 
       def write_app_code(mount_path)
         map_path = mount_path.start_with?('/') ? mount_path : "/#{mount_path}"
-        Tzispa::Utils::Indenter.new(2).tap { |code|
+        Tzispa::Utils::Indenter.new(2).tap do |code|
           code << "\nmap '#{map_path}' do\n"
           code.indent << "run Tzispa::Application.new(:#{domain.name},on: '#{map_path}').load!\n"
           code.unindent << "end\n"
-        }.to_s
+        end.to_s
       end
 
       def create_structure
-        unless File.exist? domain.path
-          Dir.mkdir "#{domain.path}"
-          APP_STRUCTURE.each { |appdir|
-            Dir.mkdir "#{domain.path}/#{appdir}"
-          }
-        end
+        return unless File.exist? domain.path
+        Dir.mkdir domain.path.to_s
+        APP_STRUCTURE.each { |appdir| Dir.mkdir "#{domain.path}/#{appdir}" }
       end
 
       def create_appconfig(default_layout, locale)
@@ -68,8 +69,11 @@ module Tzispa
       end
 
       def create_home_layout
-        tpl = Tzispa::Rig::Template.new(name: @config.default_layout || 'index', type: :layout, domain: domain, content_type: :htm)
-        tpl.create("<html><body><h1>Welcome: Tzispa #{domain.name} application is working!</h1></body></html>")
+        tpl = Tzispa::Rig::Template.new(name: @config.default_layout || 'index',
+                                        type: :layout,
+                                        domain: domain,
+                                        content_type: :htm)
+        tpl.create("<html><body><h1>Welcome: #{domain.name} is working!</h1></body></html>")
       end
 
       def create_routes
@@ -80,7 +84,7 @@ module Tzispa
           file.puts "api         '/api/:handler/:verb(~:predicate)(/:sufix)'"
         end
       end
-
     end
+
   end
 end

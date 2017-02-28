@@ -3,7 +3,7 @@
 require 'forwardable'
 require 'tzispa/helpers/error_view'
 require 'tzispa/http/context'
-
+require 'tzispa/environment'
 
 module Tzispa
   module Controller
@@ -17,41 +17,40 @@ module Tzispa
       def_delegators :@context, :request, :response, :config,
                      :login_redirect, :unauthorized_but_logged
 
-      def initialize(app, callmethod=nil)
+      def initialize(app, callmethod = nil)
         @callmethod = callmethod
         @application = app
       end
 
       def call(env)
         @context = Tzispa::Http::Context.new(@application, env)
-        invoke @callmethod if @callmethod
+        invoke if @callmethod
         response.finish
       end
 
-
       class << self
         def before(*args)
-          (@before_chain ||= []).tap { |bef|
-            args&.each { |s|
+          (@before_chain ||= []).tap do |bef|
+            args&.each do |s|
               s = s.to_sym
               bef << s unless bef.include?(s)
-            }
-          }
+            end
+          end
         end
       end
 
       private
 
-      def invoke(callmethod)
+      def invoke
         prepare_response catch(:halt) {
           begin
             do_before
-            send "#{@callmethod}"
+            send @callmethod
           rescue Tzispa::Rig::NotFound => ex
             context.logger.info "#{ex.message} (#{ex.class})"
             404
           rescue StandardError, ScriptError, SecurityError => ex
-            context.logger.error "#{ex.message} (#{ex.class}):\n #{ex.backtrace.join("\n\t") if ex.respond_to?(:backtrace) && ex.backtrace}"
+            context.logger.error error_log(ex)
             @dinfo = debug_info(ex) if Tzispa::Environment.development?
             500
           end
@@ -68,11 +67,8 @@ module Tzispa
       end
 
       def do_before
-        self.class.before.each { |hbef|
-          send hbef
-        }
+        self.class.before.each { |hbef| send hbef }
       end
-
     end
 
   end

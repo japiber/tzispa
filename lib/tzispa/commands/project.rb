@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require 'json'
-require "base64"
-require "zlib"
+require 'base64'
+require 'zlib'
 require 'pathname'
-require "tzispa/tzisparc"
-require "tzispa/environment"
+require 'tzispa/tzisparc'
+require 'tzispa/environment'
 require 'tzispa/helpers/security'
-require "tzispa/commands/helpers/project"
-require "tzispa/commands/helpers/i18n"
+require 'tzispa/commands/helpers/project'
+require 'tzispa/commands/helpers/i18n'
 
 module Tzispa
   module Commands
@@ -20,30 +22,28 @@ module Tzispa
 
       def initialize(name)
         @name = name
-        @apps = Array.new
+        @apps = []
       end
 
       def generate
-        if generate_structure
-          generate_projectrc
-          generate_environment
-          generate_rackup
-          generate_pumaconfig
-          generate_gitignore
-          generate_i18n 'en'
-          generate_i18n 'es'
-        end
+        return unless generate_structure
+        generate_projectrc
+        generate_environment
+        generate_rackup
+        generate_pumaconfig
+        generate_gitignore
+        generate_i18n 'en'
+        generate_i18n 'es'
       end
 
       private
 
       def generate_structure
-        unless File.exist? name
-          Dir.mkdir "#{name}"
-          PROJECT_STRUCTURE.each { |psdir|
-            Dir.mkdir "#{name}/#{psdir}"
-            File.open("#{name}/#{psdir}/.gitkeep", 'w')
-          }
+        return if File.exist? name
+        Dir.mkdir name.to_s
+        PROJECT_STRUCTURE.each do |psdir|
+          Dir.mkdir "#{name}/#{psdir}"
+          File.open("#{name}/#{psdir}/.gitkeep", 'w')
         end
       end
 
@@ -66,33 +66,33 @@ module Tzispa
       end
 
       def generate_gitignore
-        File.open("#{name}/.gitignore","w") do |file|
+        File.open("#{name}/.gitignore", 'w') do |file|
           GIT_IGNORE.each { |sig| file.puts sig }
         end
       end
 
       def generate_pumaconfig
-        File.open("#{name}/config/#{PUMA_CONFIG_FILE}", "w") do |f|
+        File.open("#{name}/config/#{PUMA_CONFIG_FILE}", 'w') do |f|
           f.puts PUMA_CONFIG
         end
       end
 
       def generate_boot
-        File.open("#{name}/config/#{BOOT_FILE}", "w") do |file|
-          file.puts "Tzispa::Environment['BUNDLE_GEMFILE'] ||= File.expand_path('../Gemfile', __dir__)"
+        File.open("#{name}/config/#{BOOT_FILE}", 'w') do |file|
+          file.puts 'Tzispa::Environment[\'BUNDLE_GEMFILE\'] ||= File.expand_path(\'../Gemfile\', __dir__)'
           file.puts
-          file.puts "require 'bundler/setup' # Set up gems listed in the Gemfile"
+          file.puts 'require \'bundler/setup\' # Set up gems listed in the Gemfile'
           file.puts
-          file.puts "Bundler.require(*Tzispa::Environment.instance.bundler_groups)"
+          file.puts 'Bundler.require(*Tzispa::Environment.instance.bundler_groups)'
         end
       end
 
       def generate_i18n(lang)
-        File.open("#{name}/config/locales/#{lang}.yml", "w") do |f|
+        File.open("#{name}/config/locales/#{lang}.yml", 'w') do |f|
           f.puts Zlib::Inflate.inflate(Base64.decode64(self.class.const_get("I18N_DEFAULTS_#{lang.upcase}"))).force_encoding('UTF-8').encode
         end
       end
-
     end
+
   end
 end

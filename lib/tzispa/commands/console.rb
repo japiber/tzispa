@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'tzispa/commands/command'
 
 module Tzispa
   module Commands
-    class Console < Command
 
+    class Console < Command
       ENGINES = {
         'pry'  => 'Pry',
         'irb'  => 'IRB'
@@ -18,7 +20,6 @@ module Tzispa
 
         @options = Tzispa::Environment.instance.to_options
       end
-
 
       def start
         prepare
@@ -50,7 +51,7 @@ module Tzispa
       ensure
         return Object.const_get(
           ENGINES.fetch(engine) do
-            raise ArgumentError.new("Unknown console engine: `#{engine}'")
+            raise ArgumentError("Unknown console engine: `#{engine}'")
           end
         )
       end

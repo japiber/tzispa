@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'tzispa/rig/template'
 
 module Tzispa
   module Commands
 
     class Rig
-
       attr_reader :name, :domain, :type, :mime_format
 
       def initialize(name, app, type, mime_format = nil)
@@ -17,7 +18,10 @@ module Tzispa
       end
 
       def generate
-        Tzispa::Rig::Template.new(name: name, type: type, domain: domain, format: mime_format).create
+        Tzispa::Rig::Template.new(name: name,
+                                  type: type,
+                                  domain: domain,
+                                  format: mime_format).create
       end
 
     end

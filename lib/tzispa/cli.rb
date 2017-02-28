@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'tzispa'
 
 module Tzispa
 
   class Cli < Thor
-
     desc 'version', 'Prints Tzispa version'
     def version
       require 'tzispa/version'
@@ -43,7 +44,6 @@ module Tzispa
 
     require 'tzispa/commands/cli/generate'
     register Tzispa::Commands::Cli::Generate, 'generate', 'generate [SUBCOMMAND]', 'Generate Tzispa projects and components'
-
   end
 
 end

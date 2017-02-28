@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'thread'
 require 'pathname'
 require 'singleton'
@@ -13,52 +15,52 @@ module Tzispa
 
     LOCK = Mutex.new
 
-    RACK_ENV       = 'RACK_ENV'.freeze
+    RACK_ENV = 'RACK_ENV'
 
-    TZISPA_ENV      = 'TZISPA_ENV'.freeze
+    TZISPA_ENV = 'TZISPA_ENV'
 
-    DEVELOPMENT_ENV = 'development'.freeze
+    DEVELOPMENT_ENV = 'development'
 
-    DEFAULT_ENV    = 'development'.freeze
+    DEFAULT_ENV = 'development'
 
-    PRODUCTION_ENV = 'production'.freeze
+    PRODUCTION_ENV = 'deployment'
 
-    RACK_ENV_DEPLOYMENT = 'deployment'.freeze
+    RACK_ENV_DEPLOYMENT = 'deployment'
 
-    DEFAULT_DOTENV_ENV = '.env.%s'.freeze
+    DEFAULT_DOTENV_ENV = '.env.%s'
 
-    DEFAULT_CONFIG = 'config'.freeze
+    DEFAULT_CONFIG = 'config'
 
-    TZISPA_HOST      = 'TZISPA_HOST'.freeze
+    TZISPA_HOST = 'TZISPA_HOST'
 
-    TZISPA_SSL  = 'TZISPA_SSL'.freeze
+    TZISPA_SSL = 'TZISPA_SSL'
 
-    TZISPA_SERVER_HOST = 'TZISPA_SERVER_HOST'.freeze
+    TZISPA_SERVER_HOST = 'TZISPA_SERVER_HOST'
 
-    DEFAULT_HOST    = 'localhost'.freeze
+    DEFAULT_HOST = 'localhost'
 
-    TZISPA_PORT   = 'TZISPA_PORT'.freeze
+    TZISPA_PORT = 'TZISPA_PORT'
 
-    TZISPA_SERVER_PORT = 'TZISPA_SERVER_PORT'.freeze
+    TZISPA_SERVER_PORT = 'TZISPA_SERVER_PORT'
 
     DEFAULT_PORT = 9412
 
-    DEFAULT_RACKUP = 'tzispa.ru'.freeze
+    DEFAULT_RACKUP = 'tzispa.ru'
 
-    DEFAULT_ENVIRONMENT_CONFIG = 'environment'.freeze
+    DEFAULT_ENVIRONMENT_CONFIG = 'environment'
 
-    DEFAULT_DOMAINS_PATH = 'apps'.freeze
+    DEFAULT_DOMAINS_PATH = 'apps'
 
-    DOMAINS = 'domains'.freeze
+    DOMAINS = 'domains'
 
-    DOMAINS_PATH = 'apps/%s'.freeze
+    DOMAINS_PATH = 'apps/%s'
 
-    APPLICATION = 'application'.freeze
+    APPLICATION = 'application'
 
-    APPLICATION_PATH = 'app'.freeze
+    APPLICATION_PATH = 'app'
 
-    @@opts = Hash.new
-
+    # rubocop:disable Style/ClassVars
+    @@opts = {}
 
     def initialize
       @env     = Tzispa::Env.new(env: @@opts.delete(:env) || ENV)
@@ -145,6 +147,14 @@ module Tzispa
       @port ||= @options.fetch(:port) do
         env[TZISPA_PORT] || DEFAULT_PORT
       end.to_i
+    end
+
+    def uri_port
+      if ssl?
+        ":#{port}" unless port == 443
+      else
+        ":#{port}" unless port == 80
+      end
     end
 
     def server_port

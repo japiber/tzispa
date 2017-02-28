@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pathname'
 require 'tzispa/utils/hash'
 
@@ -6,25 +8,25 @@ module Tzispa
   class Tzisparc
     using Tzispa::Utils
 
-    FILE_NAME = '.tzisparc'.freeze
+    FILE_NAME = '.tzisparc'
 
-    DEFAULT_ARCHITECTURE = 'domains'.freeze
+    DEFAULT_ARCHITECTURE = 'domains'
 
-    APP_ARCHITECTURE = 'app'.freeze
+    APP_ARCHITECTURE = 'app'
 
-    ARCHITECTURE_KEY = 'architecture'.freeze
+    ARCHITECTURE_KEY = 'architecture'
 
-    PROJECT_NAME = 'project'.freeze
+    PROJECT_NAME = 'project'
 
-    DEFAULT_TEST_SUITE = 'minitest'.freeze
+    DEFAULT_TEST_SUITE = 'minitest'
 
-    TEST_KEY = 'test'.freeze
+    TEST_KEY = 'test'
 
-    DEFAULT_TEMPLATE = 'rig'.freeze
+    DEFAULT_TEMPLATE = 'rig'
 
-    TEMPLATE_KEY = 'template'.freeze
+    TEMPLATE_KEY = 'template'
 
-    SEPARATOR = '='.freeze
+    SEPARATOR = '='
 
     def initialize(root)
       @root = root
@@ -35,12 +37,10 @@ module Tzispa
     end
 
     def default_options
-      @default_options ||= {
-                             ARCHITECTURE_KEY => DEFAULT_ARCHITECTURE,
+      @default_options ||= { ARCHITECTURE_KEY => DEFAULT_ARCHITECTURE,
                              PROJECT_NAME     => project_name,
                              TEST_KEY         => DEFAULT_TEST_SUITE,
-                             TEMPLATE_KEY     => DEFAULT_TEMPLATE
-                           }
+                             TEMPLATE_KEY     => DEFAULT_TEMPLATE }
     end
 
     def exists?
@@ -60,7 +60,7 @@ module Tzispa
     end
 
     def parse_file(path)
-      Hash.new.tap do |hash|
+      {}.tap do |hash|
         File.readlines(path).each do |line|
           key, value = line.split(SEPARATOR)
           hash[key] = value.strip
@@ -76,4 +76,5 @@ module Tzispa
       ::File.basename(@root)
     end
   end
+
 end

@@ -5,25 +5,23 @@ require 'http_router'
 require 'tzispa/utils/string'
 require 'tzispa/controller/http_error'
 
-
 module Tzispa
 
   class RouteSet
-
     using Tzispa::Utils
 
     CONTROLLERS_BASE = 'Tzispa::Controller'
 
-    attr_reader :router, :map_path
+    attr_reader :router, :map_path, :app
 
-    def initialize(app, root=nil)
+    def initialize(app, root = nil)
       @router = HttpRouter.new
       @app = app
       @router.default Controller::HttpError.new(app, :error_404)
-      @map_path = root unless root=='/'
+      @map_path = root unless root == '/'
     end
 
-    def path(path_id, params={})
+    def path(path_id, params = {})
       "#{@map_path}#{@router.path path_id, params}"
     end
 
@@ -31,24 +29,10 @@ module Tzispa
       @router.call env
     end
 
-    def routing(route_id, path, controller, methods: nil, matching: nil)
-      spec_control, callmethod = controller.to_s.split(':')
-      mpath = spec_control.split('#')
-      req_controller = mpath.pop
-      controller = req_controller.camelize
-      if mpath.count > 1
-        controller_module = mpath.collect!{ |w| w.capitalize }.join('::')
-        require_relative "./controller/#{req_controller}"
-      else
-        controller_module = CONTROLLERS_BASE
-        require "tzispa/controller/#{req_controller}"
-      end
-      @router.add(path).tap { |rule|
-        rule.to "#{controller_module}::#{controller}".constantize.new(@app, callmethod)
-        rule.name = route_id
-        rule.add_request_method(methods) if methods
-        rule.add_match_with(matching) if matching
-      }
+    def add(route_id, path, controller, methods: nil, matching: nil)
+      add_route(route_id, path, to: build_controller(controller),
+                                methods: methods,
+                                matching: matching)
     end
 
     def draw
@@ -56,21 +40,50 @@ module Tzispa
     end
 
     def index(path, controller: nil, methods: nil)
-      routing :index, path, controller || 'layout:render!', methods: methods
+      add :index, path, controller || 'layout:render!', methods: methods
     end
 
-    def api(path, controller: nil, methods:nil)
-      routing :api, path, controller || 'api:dispatch!', methods: methods
+    def api(path, controller: nil, methods: nil)
+      add :api, path, controller || 'api:dispatch!', methods: methods
     end
 
     def signed_api(path, controller: nil, methods: nil)
-      routing :sapi, path, controller || 'api:dispatch!', methods: methods
+      add :sapi, path, controller || 'api:dispatch!', methods: methods
     end
 
     def layout(layout, path, controller: nil, methods: nil)
-      routing layout, path, controller || 'layout:render!', methods: methods, matching: {layout: layout.to_s}
+      add layout, path, controller || 'layout:render!', methods: methods,
+                                                        matching: { layout: layout.to_s }
     end
 
+    private
+
+    def add_route(route_id, path, to:, methods: nil, matching: nil)
+      @router.add(path).tap do |rule|
+        rule.name = route_id
+        rule.to to
+        rule.add_request_method(methods) if methods
+        rule.add_match_with(matching) if matching
+      end
+    end
+
+    def build_controller(controller)
+      spec_control, callmethod = controller.to_s.split(':')
+      mpath = spec_control.split('#')
+      controller_class(mpath).new(app, callmethod)
+    end
+
+    def controller_class(mpath)
+      req_controller = mpath.pop
+      cmodule = if mpath.count > 1
+                  require "#{app.path}/controller/#{req_controller}"
+                  mpath.collect!(&:capitalize).join('::')
+                else
+                  require "tzispa/controller/#{req_controller}"
+                  CONTROLLERS_BASE
+                end
+      "#{cmodule}::#{req_controller.camelize}".constantize
+    end
   end
 
 end

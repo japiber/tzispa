@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rack'
 require 'tzispa/environment'
 
@@ -22,7 +24,7 @@ module Tzispa
     end
 
     def rackup_file
-      environment.rackup.to_s
+      env.rackup.to_s
     end
 
     def inner_app
@@ -30,15 +32,16 @@ module Tzispa
       instance_eval content, rackup_file
     end
 
-    def environment
-      @nvironment ||= Tzispa::Environment.instance
+    def env
+      @env ||= Tzispa::Environment.instance
     end
 
     def _extract_options
       {
+        environment: env.environment,
         config:      rackup_file,
-        Host:        environment.server_host,
-        Port:        environment.server_port,
+        Host:        env.server_host,
+        Port:        env.server_port,
         AccessLog:   []
       }
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 require 'i18n'
 
@@ -13,10 +15,9 @@ module Tzispa
     def initialize(app, environment)
       @env = environment
       @app = app
-      @cache = Hash.new
+      @cache = {}
       I18n.locale = app.config.locales.default.to_sym if app.config&.respond_to?(:locales)
     end
-
   end
 
 end

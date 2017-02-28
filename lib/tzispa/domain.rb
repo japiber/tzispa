@@ -3,6 +3,7 @@
 require 'tzispa/utils/string'
 
 module Tzispa
+
   class Domain
     using Tzispa::Utils
 
@@ -10,7 +11,7 @@ module Tzispa
 
     def initialize(name)
       @name = name
-      @root = "#{Tzispa::Environment.instance.root.to_s}/#{Tzispa::Environment.instance.apps_path}".freeze
+      @root = "#{Tzispa::Environment.instance.root}/#{Tzispa::Environment.instance.apps_path}"
       instance_eval "module ::#{name.to_s.capitalize}; end"
     end
 
@@ -27,19 +28,19 @@ module Tzispa
     end
 
     def require_dir(dir = nil)
-      rqpath = dir ? "#{path}/#{dir}" : "#{path}"
-      Dir["#{rqpath}/*.rb"].each { |file|
+      rqpath = dir ? "#{path}/#{dir}" : path.to_s
+      Dir["#{rqpath}/*.rb"].each do |file|
         name = file.split('/').last.split('.').first
         Kernel.require "#{rqpath}/#{name}"
-      }
+      end
     end
 
     def load_dir(dir = nil)
-      rqpath = dir ? "#{path}/#{dir}" : "#{path}"
-      Dir["#{rqpath}/*.rb"].each { |file|
+      rqpath = dir ? "#{path}/#{dir}" : path.to_s
+      Dir["#{rqpath}/*.rb"].each do |file|
         name = file.split('/').last
         Kernel.load "#{rqpath}/#{name}"
-      }
+      end
     end
 
     def include(cmod)
@@ -47,17 +48,16 @@ module Tzispa
     end
 
     def self.require(domain, file)
-      self.new(name: domain).require(file)
+      new(name: domain).require(file)
     end
 
     def self.load(domain, file)
-      self.new(name: domain).load(file)
+      new(name: domain).load(file)
     end
 
     protected
 
     attr_reader :root
-
-
   end
+
 end

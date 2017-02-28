@@ -34,7 +34,6 @@ module Tzispa
       HANDLER_STATUS_OK         = :ok
       HANDLER_MISSING_PARAMETER = :missing_parameter
 
-
       def initialize(context)
         @context = context
       end
@@ -48,10 +47,10 @@ module Tzispa
       class << self
         def before(*args)
           (@before_chain ||= []).tap do |bef|
-            args.each { |s|
+            args.each do |s|
               s = s.to_sym
               bef << s unless bef.include?(s)
-            }
+            end
           end
         end
       end
@@ -73,12 +72,12 @@ module Tzispa
       end
 
       def message
-        I18n.t("#{self.class.name.dottize}.#{status}", default: "#{status}") if status
+        I18n.t("#{self.class.name.dottize}.#{status}", default: status.to_s) if status
       end
 
-      def run!(verb, predicate=nil)
+      def run!(verb, predicate = nil)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless provides? verb
-        raise InvalidSign.new if sign_required? && !sign_valid?
+        raise InvalidSign if sign_required? && !sign_valid?
         do_before
         # process compound predicates
         args = predicate ? predicate.split(',') : nil
@@ -92,13 +91,16 @@ module Tzispa
       protected
 
       def static_path_sign?
-        context.path_sign? context.router_params[:sign], context.router_params[:handler], context.router_params[:verb], context.router_params[:predicate]
+        context.path_sign? context.router_params[:sign],
+                           context.router_params[:handler],
+                           context.router_params[:verb],
+                           context.router_params[:predicate]
       end
 
       def do_before
         self.class.before.each { |hbef| send hbef }
       end
-
     end
+
   end
 end

@@ -1,11 +1,11 @@
+# frozen_string_literal: true
+
 require 'tzispa/commands/command'
 
 module Tzispa
   module Commands
 
-
     class Server < Command
-
       def initialize(options)
         super(options)
 
@@ -20,7 +20,6 @@ module Tzispa
       protected
 
       attr_reader :server
-
     end
 
   end

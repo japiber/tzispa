@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'tzispa/controller/api'
 
 module Tzispa
   module Commands
 
     class Api
-
       attr_reader :name, :domain
 
       def initialize(name, app)
@@ -17,7 +18,6 @@ module Tzispa
       def generate
         Tzispa::Controller::Api.new.generate_handler(domain, name)
       end
-
     end
 
   end

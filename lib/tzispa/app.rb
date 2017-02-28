@@ -10,35 +10,38 @@ require 'tzispa_data'
 
 module Tzispa
 
+  class ApplicationError < StandardError; end
+  class UnknownApplication < ApplicationError; end
+  class DuplicateDomain < ApplicationError
+    def initialize(app_name)
+      super "You have try to add an app with a duplicate domain name #{app_name}"
+    end
+  end
+
   class Application
     extend Forwardable
 
-    attr_reader :domain, :config, :repository, :logger, :routes
+    attr_reader :domain, :logger, :map_path
 
-    def_delegator :@domain, :name
-    def_delegators :@routes, :map_path, :routing, :index, :api, :signed_api, :layout
-
+    def_delegators :@domain, :name, :path
+    def_delegators :@routes, :routing, :index, :api, :signed_api, :layout
 
     class << self
-
-      alias :__new__ :new
+      alias __new__ :new
 
       def new(*args, &block)
-        __new__(*args, &block).tap { |app|
-          add app
-        }
+        __new__(*args, &block).tap { |app| add app }
       end
 
+      # rubocop:disable Style/ClassVars
       def applications
         synchronize do
-          @@applications ||= Hash.new{ |hash, key| raise UnknownApplication.new("#{key}") }
+          @@applications ||= Hash.new { |_, key| raise UnknownApplication(key.to_s) }
         end
       end
 
       def synchronize
-        Mutex.new.synchronize {
-          yield
-        }
+        Mutex.new.synchronize { yield }
       end
 
       def [](name)
@@ -47,21 +50,15 @@ module Tzispa
 
       def add(app)
         synchronize do
-          raise DuplicateDomain.new("You have try to add an app with a duplicate domain name #{app.name}") if applications.has_key? app.name
+          raise DuplicateDomain(app.name) if applications.key?(app.name)
           applications[app.name] = app
         end
       end
-
     end
 
     def initialize(appid, on: nil, &block)
       @domain = Domain.new(appid)
-      @config = Config::AppConfig.new(@domain).load!
-      @routes = RouteSet.new(self, on)
-      @logger = Logger.new("logs/#{domain.name}.log", config.logging&.shift_age).tap { |log|
-        log.level = Tzispa::Environment.development? ? Logger::DEBUG : Logger::INFO
-      } if config.logging&.enabled
-      @repository = Data::Repository.new(config.repository.to_h) if config.respond_to? :repository
+      @map_path = on
       instance_eval(&block) if block
     end
 
@@ -70,18 +67,40 @@ module Tzispa
     end
 
     def load!
-      tap { |app|
-        app.class.synchronize {
+      tap do |app|
+        app.class.synchronize do
+          logging
           load_locales
           domain_setup
           routes_setup
           repository&.load!(domain)
-        }
-      }
+        end
+      end
     end
 
     def [](domain)
       self.class[domain]
+    end
+
+    def default_layout?(layout)
+      config.default_layout.to_sym == layout
+    end
+
+    def environment
+      @environment ||= Tzispa::Environment.instance
+    end
+
+    def routes
+      @routes ||= RouteSet.new(self, map_path)
+    end
+
+    def config
+      @config ||= Config::AppConfig.new(@domain).load!
+    end
+
+    def repository
+      return unless config.respond_to? :repository
+      @repository ||= Data::Repository.new(config.repository.to_h)
     end
 
     private
@@ -102,19 +121,16 @@ module Tzispa
       end
     end
 
-    def load_locales
-      if config.respond_to?(:locales)
-        I18n.enforce_available_locales = false
-        I18n.load_path += Dir["config/locales/*.yml", "#{domain.path}/locales/*.yml"]
-      end
+    def logging
+      return unless config&.logging&.enabled
+      @logger = Logger.new("logs/#{domain.name}.log", config.logging&.shift_age)
+      @logger.level = Tzispa::Environment.development? ? Logger::DEBUG : Logger::INFO
     end
 
-    public
-
-    class ApplicationError < StandardError; end
-    class UnknownApplication < ApplicationError; end
-    class DuplicateDomain < ApplicationError; end
-
-
+    def load_locales
+      return unless config.respond_to?(:locales)
+      I18n.enforce_available_locales = false
+      I18n.load_path += Dir['config/locales/*.yml', "#{domain.path}/locales/*.yml"]
+    end
   end
 end
