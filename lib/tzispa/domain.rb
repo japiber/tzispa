@@ -7,12 +7,20 @@ module Tzispa
   class Domain
     using Tzispa::Utils
 
-    attr_reader :name
+    attr_reader :name, :root
 
     def initialize(name)
       @name = name
       @root = "#{Tzispa::Environment.instance.root}/#{Tzispa::Environment.instance.apps_path}"
       instance_eval "module ::#{name.to_s.capitalize}; end"
+    end
+
+    def setup
+      require_dir
+      require_dir 'helpers'
+      require_dir 'services'
+      require_dir 'api'
+      require_dir 'middleware'
     end
 
     def path
@@ -54,10 +62,6 @@ module Tzispa
     def self.load(domain, file)
       new(name: domain).load(file)
     end
-
-    protected
-
-    attr_reader :root
   end
 
 end
