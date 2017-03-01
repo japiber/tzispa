@@ -21,6 +21,17 @@ module Tzispa
       @map_path = root unless root == '/'
     end
 
+    def setup
+      draw do
+        contents = File.read(routes_definitions)
+        instance_eval(contents, File.basename(routes_definitions), 0)
+      end
+    end
+
+    def routes_definitions
+      @routes_definitions ||= "config/routes/#{app.name}.rb"
+    end
+
     def path(path_id, params = {})
       "#{@map_path}#{@router.path path_id, params}"
     end
