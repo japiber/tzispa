@@ -10,14 +10,6 @@ require 'tzispa_data'
 
 module Tzispa
 
-  class ApplicationError < StandardError; end
-  class UnknownApplication < ApplicationError; end
-  class DuplicateDomain < ApplicationError
-    def initialize(app_name)
-      super "You have try to add an app with a duplicate domain name #{app_name}"
-    end
-  end
-
   class Application
     extend Forwardable
 
@@ -50,7 +42,7 @@ module Tzispa
 
       def add(app)
         synchronize do
-          raise DuplicateDomain(app.name) if applications.key?(app.name)
+          raise DuplicateDomain.new(app.name) if applications.key?(app.name)
           applications[app.name] = app
         end
       end
@@ -71,8 +63,8 @@ module Tzispa
         app.class.synchronize do
           logging
           load_locales
-          domain_setup
-          routes_setup
+          domain.setup
+          routes.setup
           repository&.load!(domain)
         end
       end
@@ -105,22 +97,6 @@ module Tzispa
 
     private
 
-    def domain_setup
-      domain.require_dir
-      domain.require_dir 'helpers'
-      domain.require_dir 'services'
-      domain.require_dir 'api'
-      domain.require_dir 'middleware'
-    end
-
-    def routes_setup
-      path = "config/routes/#{name}.rb"
-      routes.draw do
-        contents = File.read(path)
-        instance_eval(contents, File.basename(path), 0)
-      end
-    end
-
     def logging
       return unless config&.logging&.enabled
       @logger = Logger.new("logs/#{domain.name}.log", config.logging&.shift_age)
@@ -133,4 +109,13 @@ module Tzispa
       I18n.load_path += Dir['config/locales/*.yml', "#{domain.path}/locales/*.yml"]
     end
   end
+
+  class ApplicationError < StandardError; end
+  class UnknownApplication < ApplicationError; end
+  class DuplicateDomain < ApplicationError
+    def initialize(app_name)
+      super "You have tried to add an app with a duplicate domain name #{app_name}"
+    end
+  end
+
 end
