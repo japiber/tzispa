@@ -1,4 +1,5 @@
-# -*- encoding: utf-8 -*-
+# coding: utf-8
+
 require File.expand_path('../lib/tzispa/version', __FILE__)
 
 Gem::Specification.new do |s|
@@ -13,7 +14,7 @@ Gem::Specification.new do |s|
   s.description = 'A sparkling web framework Rack based'
   s.licenses    = ['MIT']
 
-  s.required_ruby_version     = '~> 2.3'
+  s.required_ruby_version = '~> 2.3'
 
   s.add_dependency 'bundler',        '~> 1.14'
   s.add_dependency 'rack',           '~> 2.0',    '>= 2.0.1'
@@ -26,7 +27,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'tzispa_data',    '~> 0.3'
   s.add_dependency 'dotenv',         '~> 2.2'
 
-  s.files         = Dir.glob("{lib,bin}/**/*") + %w(README.md CHANGELOG.md LICENSE tzispa.gemspec)
+  s.add_development_dependency 'shotgun'
+
+  s.files         = Dir.glob('{lib,bin}/**/*') + %w(README.md CHANGELOG.md LICENSE tzispa.gemspec)
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ['lib']
 end
