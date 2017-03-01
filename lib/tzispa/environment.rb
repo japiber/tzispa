@@ -93,12 +93,16 @@ module Tzispa
       environment == DEVELOPMENT_ENV
     end
 
+    def code_reloading?
+      development?
+    end
+
     def environment?(*names)
       names.map(&:to_s).include?(environment)
     end
 
     def bundler_groups
-      [:default, environment]
+      [:default, environment.to_sym]
     end
 
     def project_name
@@ -139,7 +143,7 @@ module Tzispa
 
     def server_host
       @server_host ||= @options.fetch(:server_host) do
-        env[TZISPA_SERVER_HOST] || env[TZISPA_HOST] || DEFAULT_HOST
+        env[TZISPA_SERVER_HOST] || host
       end
     end
 
@@ -149,18 +153,18 @@ module Tzispa
       end.to_i
     end
 
+    def server_port
+      @server_port ||= @options.fetch(:server_port) do
+        env[TZISPA_SERVER_PORT] || port
+      end.to_i
+    end
+
     def uri_port
       if ssl?
         ":#{port}" unless port == 443
       else
         ":#{port}" unless port == 80
       end
-    end
-
-    def server_port
-      @port ||= @options.fetch(:public_port) do
-        env[TZISPA_SERVER_PORT] || env[TZISPA_PORT] || DEFAULT_PORT
-      end.to_i
     end
 
     def domains_path

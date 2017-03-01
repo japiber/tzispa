@@ -14,26 +14,38 @@ module Tzispa
     end
 
     def start
+      preload
       super
     end
 
     private
 
     def setup
-      @app = inner_app
-    end
-
-    def rackup_file
-      env.rackup.to_s
-    end
-
-    def inner_app
-      content = "Rack::Builder.new {( #{::File.read(rackup_file)}\n )}.to_app"
-      instance_eval content, rackup_file
+      instance_eval 'load "./config/boot.rb"'
+      @app = if code_reloading?
+               Shotgun::Loader.new(rackup_file)
+             else
+               config = "Rack::Builder.new {( #{::File.read(rackup_file)}\n )}.to_app"
+               instance_eval config, rackup_file
+             end
     end
 
     def env
       @env ||= Tzispa::Environment.instance
+    end
+
+    def code_reloading?
+      env.code_reloading?
+    end
+
+    def preload
+      return unless code_reloading?
+      Shotgun.enable_copy_on_write
+      Shotgun.preload
+    end
+
+    def rackup_file
+      env.rackup.to_s
     end
 
     def _extract_options
