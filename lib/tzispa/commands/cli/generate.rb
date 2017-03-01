@@ -7,14 +7,6 @@ module Tzispa
     module Cli
 
       class Generate < Thor
-        require 'tzispa/commands/project'
-        desc 'project', 'Generate a new Tzispa project'
-        def project(name)
-          require 'tzispa/commands/project'
-          Tzispa::Commands::Project.new(name).generate
-          puts "Project '#{name}' has been created"
-        end
-
         require 'tzispa/commands/app'
         desc 'app', 'Generate new application into a project'
         method_option :mount, aliases: '-m', desc: 'The mount point for this app', default: '/'

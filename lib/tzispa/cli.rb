@@ -12,6 +12,13 @@ module Tzispa
       puts "v#{VERSION}"
     end
 
+    desc 'new', 'Generate a new Tzispa project'
+    def new(name)
+      require 'tzispa/commands/project'
+      Tzispa::Commands::Project.new(name).generate
+      puts "Project '#{name}' has been created"
+    end
+
     require 'tzispa/commands/server'
     desc 'server', 'Start Tzispa app server'
     method_option :port, aliases: '-p', desc: 'The port to run the server on'
@@ -32,7 +39,7 @@ module Tzispa
 
     require 'tzispa/commands/console'
     desc 'console', 'Starts a Tzispa console'
-    method_option :engine, desc: "Choose a specific console engine: (#{Tzispa::Commands::Console::ENGINES.keys.join('/')})"
+    method_option :engine, desc: "Choose: (#{Tzispa::Commands::Console::ENGINES.keys.join('/')})"
     method_option :help, desc: 'Displays the usage help'
     def console
       if options[:help]
@@ -43,7 +50,8 @@ module Tzispa
     end
 
     require 'tzispa/commands/cli/generate'
-    register Tzispa::Commands::Cli::Generate, 'generate', 'generate [SUBCOMMAND]', 'Generate Tzispa projects and components'
+    register Tzispa::Commands::Cli::Generate, 'generate', 'generate [SUBCOMMAND]',
+             'Generate Tzispa components'
   end
 
 end

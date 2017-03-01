@@ -54,14 +54,13 @@ module Tzispa
 
       def generate_environment
         File.open("#{name}/.env.production", 'w') { |file| file.puts ENVC_DEFAULTS % secret(64) }
-        File.open("#{name}/.env.development", 'w') { |file| file.puts ENVC_DEFAULTS % secret(64) }
+        File.open("#{name}/.env.deployment", 'w') { |file| file.puts ENVC_DEFAULTS % secret(64) }
         File.open("#{name}/.env.test", 'w') { |file| file.puts ENVC_DEFAULTS % secret(64) }
       end
 
       def generate_rackup
         File.open("#{name}/#{Tzispa::Environment::DEFAULT_RACKUP}", 'w') do |file|
           file.puts "\# project #{name} started on #{Time.now}"
-          file.puts "require_relative 'config/boot'\n"
         end
       end
 
@@ -73,14 +72,12 @@ module Tzispa
 
       def generate_pumaconfig
         File.open("#{name}/config/#{PUMA_CONFIG_FILE}", 'w') do |f|
-          f.puts PUMA_CONFIG
+          f.puts PUMA_CONFIG % name
         end
       end
 
       def generate_boot
         File.open("#{name}/config/#{BOOT_FILE}", 'w') do |file|
-          file.puts 'Tzispa::Environment[\'BUNDLE_GEMFILE\'] ||= File.expand_path(\'../Gemfile\', __dir__)'
-          file.puts
           file.puts 'require \'bundler/setup\' # Set up gems listed in the Gemfile'
           file.puts
           file.puts 'Bundler.require(*Tzispa::Environment.instance.bundler_groups)'
@@ -89,7 +86,9 @@ module Tzispa
 
       def generate_i18n(lang)
         File.open("#{name}/config/locales/#{lang}.yml", 'w') do |f|
-          f.puts Zlib::Inflate.inflate(Base64.decode64(self.class.const_get("I18N_DEFAULTS_#{lang.upcase}"))).force_encoding('UTF-8').encode
+          content = Base64.decode64(self.class.const_get("I18N_DEFAULTS_#{lang.upcase}"))
+          content = Zlib::Inflate.inflate(content)
+          f.puts content.force_encoding('UTF-8').encode
         end
       end
     end

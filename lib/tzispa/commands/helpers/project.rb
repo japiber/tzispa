@@ -26,24 +26,27 @@ module Tzispa
 
         PUMA_CONFIG = <<-PUMACONFIG
 #!/usr/bin/env puma
-app_dir = Tzispa::Environment.instance.root.to_s
+env = Tzispa::Environment.instance
+app_dir = env.root.to_s
 tmp_dir = "\#{app_dir}/tmp"
 logs_dir = "\#{app_dir}/logs"
-environment Tzispa::Environment['TZISPA_ENV']
-#daemonize true
+environment env.environment
+daemonize env.daemonize?
 pidfile "\#{tmp_dir}/puma.pid"
 state_path "\#{tmp_dir}/puma.state"
-# stdout_redirect 'logs/puma.stdout', 'logs/puma.stderr'
+if env.daemonize?
+  stdout_redirect "\#{logs_dir}/puma.stdout", "\#{logs_dir}/puma.stderr"
+end
 workers 0
 # threads 0, 16
-if Tzispa::Environment.ssl?
-  path_to_key = Tzispa::Environment['TZISPA_SSL_KEY']
-  path_to_cert = Tzispa::Environment['TZISPA_SSL_CERT']
-  bind "ssl://\#{Tzispa::Environment.instance.server_host}:\#{Tzispa::Environment.instance.server_port}?key=\#{path_to_key}&cert=\#{path_to_cert}"
+if env.ssl?
+  path_to_key = "\#{app_dir}/\#{env['TZISPA_SSL_KEY']}"
+  path_to_cert = "\#{app_dir}/\#{env['TZISPA_SSL_CERT']}"
+  bind "ssl://\#{env.server_host}:\#{env.server_port}?key=\#{path_to_key}&cert=\#{path_to_cert}"
 else
-  bind "tcp://\#{Tzispa::Environment.instance.server_host}:\#{Tzispa::Environment.instance.server_port}"
+  bind "tcp://\#{env.server_host}:\#{env.server_port}"
 end
-tag 'your_app_tag'
+tag '%s'
 worker_timeout 90
         PUMACONFIG
 
@@ -52,7 +55,12 @@ worker_timeout 90
 WEB_SESSIONS_SECRET="%s"
 WEB_SESSIONS_TIMEOUT=2400
 TZISPA_HOST=localhost
+TZISPA_SERVER_HOST=0.0.0.0
+# TZISPA_PORT = 9412
+# TZISPA_SERVER_PORT = 9412
 TZISPA_SSL=no
+# TZISPA_SSL_KEY=.ssl.key
+# TZISPA_SSL_CERT=.ssl.cer
         ENVCDEFAULTS
 
       end
