@@ -5,7 +5,8 @@ require 'logger'
 require 'i18n'
 require 'tzispa/domain'
 require 'tzispa/route_set'
-require 'tzispa/config/appconfig'
+require 'tzispa/config/app_config'
+require 'tzispa/config/db_config'
 require 'tzispa_data'
 
 module Tzispa
@@ -78,8 +79,8 @@ module Tzispa
       config.default_layout.to_sym == layout
     end
 
-    def environment
-      @environment ||= Tzispa::Environment.instance
+    def env
+      Tzispa::Environment.instance
     end
 
     def routes
@@ -91,8 +92,10 @@ module Tzispa
     end
 
     def repository
-      return unless config.respond_to? :repository
-      @repository ||= Data::Repository.new(config.repository.to_h)
+      @repository ||= begin
+        dbcfg = Config::DbConfig.new(env.environment)&.to_h
+        Data::Repository.new(dbcfg) if dbcfg&.count&.positive?
+      end
     end
 
     private
