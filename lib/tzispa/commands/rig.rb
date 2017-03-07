@@ -23,7 +23,6 @@ module Tzispa
                                   domain: domain,
                                   format: mime_format).create
       end
-
     end
 
   end
