@@ -9,6 +9,7 @@ require 'tzispa/environment'
 require 'tzispa/helpers/security'
 require 'tzispa/commands/helpers/project'
 require 'tzispa/commands/helpers/i18n'
+require 'tzispa/config/db_config'
 
 module Tzispa
   module Commands
@@ -30,10 +31,10 @@ module Tzispa
         generate_projectrc
         generate_environment
         generate_rackup
-        generate_pumaconfig
+        generate_puma_config
         generate_gitignore
-        generate_i18n 'en'
-        generate_i18n 'es'
+        generate_i18n(%w(en es))
+        generate_database_config
       end
 
       private
@@ -70,10 +71,14 @@ module Tzispa
         end
       end
 
-      def generate_pumaconfig
+      def generate_puma_config
         File.open("#{name}/config/#{PUMA_CONFIG_FILE}", 'w') do |f|
           f.puts PUMA_CONFIG % name
         end
+      end
+
+      def generate_database_config
+        Tzispa::Config::DbConfig.create_default name
       end
 
       def generate_boot
@@ -84,11 +89,13 @@ module Tzispa
         end
       end
 
-      def generate_i18n(lang)
-        File.open("#{name}/config/locales/#{lang}.yml", 'w') do |f|
-          content = Base64.decode64(self.class.const_get("I18N_DEFAULTS_#{lang.upcase}"))
-          content = Zlib::Inflate.inflate(content)
-          f.puts content.force_encoding('UTF-8').encode
+      def generate_i18n(langs)
+        langs.each do |lang|
+          File.open("#{name}/config/locales/#{lang}.yml", 'w') do |f|
+            content = Base64.decode64(self.class.const_get("I18N_DEFAULTS_#{lang.upcase}"))
+            content = Zlib::Inflate.inflate(content)
+            f.puts content.force_encoding('UTF-8').encode
+          end
         end
       end
     end
