@@ -23,9 +23,18 @@ module Tzispa
 
       def initialize(app, env)
         super(app, env)
-        @request = Tzispa::Http::Request.new(env)
-        @response = Tzispa::Http::Response.new
+        @request = Request.new(env)
+        @response = Response.new
         init_session
+      end
+
+      def request_method
+        if request.request_method == 'POST' && request['_method']
+          env[Request::REQUEST_METHOD] = request['_method']
+          request['_method']
+        else
+          request.request_method
+        end
       end
 
       def router_params
