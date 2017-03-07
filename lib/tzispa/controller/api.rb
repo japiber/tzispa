@@ -18,14 +18,25 @@ module Tzispa
       include Tzispa::Helpers::Response
 
       def dispatch!
-        handler_name, domain_name = context.router_params[:handler].split('.').reverse
-        domain = domain_name.nil? ? context.app.domain : Tzispa::Domain.new(name: domain_name)
         verb = context.router_params[:verb]
         predicate = context.router_params[:predicate]
-        handler = self.class.handler_class(domain, handler_name).new(context)
+        handler = prepare_handler
         handler.run! verb, predicate
         send(handler.response_verb, handler) if handler.response_verb
         response.finish
+      end
+
+      def prepare_handler
+        self.class.handler_class(request_method, domain, handler_name).new(context)
+      end
+
+      def domain
+        _, domain_name = context.router_params[:handler].split('.').reverse
+        domain_name ? Tzispa::Domain.new(name: domain_name) : context.app.domain
+      end
+
+      def handler_name
+        context.router_params[:handler].split('.').last
       end
 
       def redirect(handler)
@@ -47,7 +58,7 @@ module Tzispa
 
       def json(handler)
         content_type :json
-        data =  handler.data.is_a?(::String) ? JSON.parse(handler.data) : handler.data.to_json
+        data = handler.data.is_a?(::String) ? JSON.parse(handler.data) : handler.data.to_json
         response.body << if handler.error?
                            Hash[:__error, true,
                                 :__error_msg, handler.message,
@@ -69,6 +80,10 @@ module Tzispa
         send_file handler.data[:path], handler.data
       end
 
+      def request_method
+        context.request_method.downcase
+      end
+
       class << self
         def handler_class_name(handler_name)
           "#{handler_name.camelize}Handler"
@@ -78,13 +93,14 @@ module Tzispa
           "#{domain.path}/api/#{handler_name}.rb"
         end
 
-        def handler_namespace(domain)
-          "#{domain.name.to_s.camelize}::Api"
+        def handler_namespace(domain, request_method)
+          "#{domain.name.to_s.camelize}::Api::#{request_method.capitalize}"
         end
 
-        def handler_class(domain, handler_name)
-          domain.require "api/#{handler_name}"
-          "#{handler_namespace domain}::#{handler_class_name handler_name}".constantize
+        def handler_class(request_method, domain, handler_name)
+          domain.require "api/#{request_method}/#{handler_name}"
+          "#{handler_namespace domain, request_method}::#{handler_class_name handler_name}"
+            .constantize
         end
 
         def generate_handler(domain, name)
