@@ -4,7 +4,7 @@ require 'json'
 require 'tzispa/domain'
 require 'tzispa/utils/string'
 require 'tzispa/utils/indenter'
-require 'tzispa/config/appconfig'
+require 'tzispa/config/app_config'
 require_relative 'command'
 require_relative 'project'
 
