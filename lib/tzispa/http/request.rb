@@ -10,6 +10,8 @@ module Tzispa
 
       HTTP_X_FORWARDED_HOST = 'HTTP_X_FORWARDED_HOST'
 
+      REQUEST_METHOD = Rack::REQUEST_METHOD
+
       alias secure? ssl?
 
       def forwarded?
