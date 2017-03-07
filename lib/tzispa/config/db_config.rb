@@ -20,10 +20,6 @@ module Tzispa
         config.to_h[env]&.to_h
       end
 
-      def filename
-        @filename ||= "config/#{CONFIG_FILENAME}.yml"
-      end
-
       def load!
         if @cftime.nil?
           @cftime = File.ctime(filename)
@@ -34,13 +30,36 @@ module Tzispa
         @config ||= Tzispa::Config::Yaml.load(filename)
       end
 
-      def create_default
-        hcfg = {}.tap do |cfg|
-          cfg['development'] = {}
-          cfg['deployment'] = {}
-          cfg['test'] = {}
+      def filename
+        DbConfig.filename
+      end
+
+      class << self
+        def filename
+          @filename ||= "config/#{CONFIG_FILENAME}.yml"
         end
-        Yaml.save(hcfg, filename)
+
+        def create_default(path)
+          hcfg = {}.tap do |cfg|
+            cfg['development'] = {}
+            cfg['deployment'] = {}
+            cfg['test'] = {}
+          end
+          Yaml.save(hcfg, File.join(path, filename))
+        end
+
+        def add_repository(name, adapter, dbconn)
+          hs = YAML.safe_load(File.open(filename))
+          hs.each do |_, v|
+            v[name] = {
+              'adapter' => adapter,
+              'database' => dbconn,
+              'connection_validation' => 'No',
+              'local' => 'Yes'
+            }
+          end
+          Yaml.save(hs, filename)
+        end
       end
     end
 
