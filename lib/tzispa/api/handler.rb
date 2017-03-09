@@ -26,22 +26,25 @@ module Tzispa
 
       using Tzispa::Utils
 
-      attr_reader :context, :response_verb, :data, :status
+      attr_reader :context, :type, :data, :error, :status
       def_delegators :@context, :request, :response, :app, :repository,
                      :config, :logger, :unauthorized_but_logged, :login_redirect
 
-      HANDLER_STATUS_UNDEFINED  = nil
-      HANDLER_STATUS_OK         = :ok
+      attr_writer :error
+
+      HANDLER_OK                = :ok
       HANDLER_MISSING_PARAMETER = :missing_parameter
 
       def initialize(context)
         @context = context
+        @error = nil
+        @status = nil
       end
 
-      def result(response_verb:, data: nil, status: HANDLER_STATUS_UNDEFINED)
-        @response_verb = response_verb
-        @status = status if status
+      def result(type:, data: nil, error: nil)
+        @type = type
         @data = data
+        @error = error
       end
 
       class << self
@@ -56,23 +59,28 @@ module Tzispa
       end
 
       def error?
-        status && status != HANDLER_STATUS_OK
+        error && error != HANDLER_OK
       end
 
-      def result_json(data, status: nil)
-        result response_verb: :json, data: data, status: status
+      def error_status(error, status = nil)
+        @error = error
+        @status = status
       end
 
-      def result_download(data, status: nil)
-        result response_verb: :download, data: data, status: status
+      def result_json(data, error: nil)
+        result type: :json, data: data, error: error
+      end
+
+      def result_download(data, error: nil)
+        result type: :download, data: data, error: error
       end
 
       def not_found
-        result response_verb: :not_found
+        result type: :not_found
       end
 
       def message
-        I18n.t("#{self.class.name.dottize}.#{status}", default: status.to_s) if status
+        I18n.t("#{self.class.name.dottize}.#{error}", default: error.to_s) if error
       end
 
       def run!(verb, predicate = nil)
@@ -84,8 +92,12 @@ module Tzispa
         send verb, *args
       end
 
-      def set_status(value)
-        @status = value
+      def redirect_url(url)
+        if url && !url.strip.empty?
+          url.start_with?('#') ? "#{request.referer}#{url}" : url
+        else
+          request.referer
+        end
       end
 
       protected
