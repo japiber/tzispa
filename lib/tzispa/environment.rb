@@ -11,7 +11,7 @@ module Tzispa
 
   class Environment
     include Singleton
-    using Tzispa::Utils
+    using Tzispa::Utils::TzHash
 
     LOCK = Mutex.new
 

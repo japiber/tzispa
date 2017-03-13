@@ -13,7 +13,7 @@ module Tzispa
     class ControllerException < StandardError; end
 
     class Api < Base
-      using Tzispa::Utils
+      using Tzispa::Utils::TzString
 
       include Tzispa::Helpers::Response
 

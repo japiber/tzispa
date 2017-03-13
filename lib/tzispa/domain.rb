@@ -5,7 +5,7 @@ require 'tzispa/utils/string'
 module Tzispa
 
   class Domain
-    using Tzispa::Utils
+    using Tzispa::Utils::TzString
 
     attr_reader :name, :root
 

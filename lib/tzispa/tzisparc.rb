@@ -6,7 +6,7 @@ require 'tzispa/utils/hash'
 module Tzispa
 
   class Tzisparc
-    using Tzispa::Utils
+    using Tzispa::Utils::TzHash
 
     FILE_NAME = '.tzisparc'
 

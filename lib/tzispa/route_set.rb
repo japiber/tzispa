@@ -8,7 +8,7 @@ require 'tzispa/controller/http_error'
 module Tzispa
 
   class RouteSet
-    using Tzispa::Utils
+    using Tzispa::Utils::TzString
 
     CONTROLLERS_BASE = 'Tzispa::Controller'
 

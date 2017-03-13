@@ -24,7 +24,7 @@ module Tzispa
       include Tzispa::Helpers::Provider
       include Tzispa::Helpers::SignRequirer
 
-      using Tzispa::Utils
+      using Tzispa::Utils::TzString
 
       attr_reader :context, :type, :data, :error, :status
       def_delegators :@context, :request, :response, :app, :repository,
