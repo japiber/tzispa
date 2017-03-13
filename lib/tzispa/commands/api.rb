@@ -1,48 +1,53 @@
 # frozen_string_literal: true
 
+require 'fileutils'
 require 'tzispa/controller/api'
+require 'tzispa/commands/command'
+require 'tzispa/utils/indenter'
 
 module Tzispa
   module Commands
 
-    class Api
-      attr_reader :name, :domain
+    class Api < Command
+      attr_reader :name, :domain, :verb
 
-      def initialize(name, app)
-        @prj = Project.open
-        raise "Application '#{app}' does not exists in project file" unless @prj.apps.include?(app)
+      def initialize(name, app, verb, options = nil)
+        super(options)
         @domain = Tzispa::Domain.new app
         @name = name
+        @verb = verb
       end
 
       def generate
-        generate_handler(domain, name, request_method)
+        file_name = Tzispa::Controller::Api.handler_class_file(domain, name, verb)
+        raise "The handler '#{name}' already exist" if File.exist?(file_name)
+        namespace = Tzispa::Controller::Api.handler_namespace(domain, verb)
+        class_name = Tzispa::Controller::Api.handler_class_name(name)
+        create_file file_name, namespace, class_name
       end
 
       private
 
-      def generate_handler(domain, name, request_method)
-        class_name = Tzispa::Api.handler_class_name(name)
-        file_name = Tzispa::Api.handler_class_file(domain, name, request_method)
-        raise "The handler '#{name}' already exist" if File.exist?(file_name)
-        namespace = Tzispa::Api.handler_namespace(domain, request_method)
+      def create_file(file_name, ns, class_name)
+        dir, = Pathname.new(file_name).split
+        FileUtils.mkpath dir
         File.open(file_name, 'w') do |f|
-          f.puts handler_code(namespace, class_name)
+          f.puts handler_code(ns, class_name)
         end
       end
 
       def handler_code(namespace, class_name)
-        String.new.tap do |code|
-          code.indenter("require 'tzispa/api/handler'\n\n")
+        Tzispa::Utils::Indenter.new.tap do |code|
+          code << "require 'tzispa/api/handler'\n\n"
           level = 0
           namespace.split('::').each do |ns|
-            code.indenter("module #{ns}\n", level.positive? ? 2 : 0).to_s
+            level.positive? ? code.indent << "module #{ns}\n" : code << "module #{ns}\n"
             level += 1
           end
-          code.indenter("\nclass #{class_name} < Tzispa::Api::Handler\n\n", 2)
-          code.indenter("end\n\n")
-          namespace.split('::').each { code.unindenter("end\n", 2) }
-        end
+          code.indent << "\nclass #{class_name} < Tzispa::Api::Handler\n\n"
+          code << "end\n\n"
+          namespace.split('::').each { code.unindent << "end\n" }
+        end.to_s
       end
     end
 

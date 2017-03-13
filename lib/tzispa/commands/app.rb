@@ -5,29 +5,26 @@ require 'tzispa/domain'
 require 'tzispa/utils/string'
 require 'tzispa/utils/indenter'
 require 'tzispa/config/app_config'
-require_relative 'command'
-require_relative 'project'
+require 'tzispa/commands/command'
 
 module Tzispa
   module Commands
-    class App
-      using Tzispa::Utils
+    class App < Command
+      using Tzispa::Utils::TzString
 
       APP_STRUCTURE = [
         'api', 'locales', 'error', 'controller', 'helpers', 'view', 'view/_',
         'view/_/block', 'view/_/layout', 'view/_/static', 'services'
       ].freeze
 
-      NO_PROJECT_FOLDER = 'You must be located in a Tzispa project folder to generate new apps'
-
       attr_reader :domain
 
-      def initialize(name)
+      def initialize(name, options = nil)
+        super(options)
         @domain = Tzispa::Domain.new(name)
       end
 
       def generate(mount_path, index_layout, locale)
-        raise NO_PROJECT_FOLDER unless project_folder?
         update_rackup mount_path
         create_structure
         create_appconfig index_layout, locale
@@ -36,10 +33,6 @@ module Tzispa
       end
 
       private
-
-      def project_folder?
-        File.exist?(Tzispa::Environment::DEFAULT_RACKUP)
-      end
 
       def update_rackup(mount_path = nil)
         mount_path ||= DEFAULT_MOUNT_PATH

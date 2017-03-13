@@ -5,12 +5,11 @@ require 'tzispa/rig/template'
 module Tzispa
   module Commands
 
-    class Rig
+    class Rig < Command
       attr_reader :name, :domain, :type, :mime_format
 
-      def initialize(name, app, type, mime_format = nil)
-        @prj = Project.open
-        raise "Application '#{app}' does not exists in project file" unless @prj.apps.include?(app)
+      def initialize(name, app, type, mime_format = nil, options = nil)
+        super(options)
         @domain = Tzispa::Domain.new app
         @type = type.to_sym
         @name = name

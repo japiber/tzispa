@@ -46,8 +46,10 @@ module Tzispa
         desc 'api', 'Generate new api handler'
         method_option :app, aliases: '-a',
                             desc: 'The app where the api handler will be created', required: true
+        method_option :verb, aliases: '-v',
+                             desc: 'The http verb that this api will respond to', required: true
         def api(name)
-          hnd = Tzispa::Commands::Api.new(name, options[:app])
+          hnd = Tzispa::Commands::Api.new(name, options[:app], options[:verb])
           hnd.generate
           puts "Api handler '#{name}' has been created in #{options[:app]}"
         end
