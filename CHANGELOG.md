@@ -2,6 +2,18 @@ Tzispa
 
 General purpose web framework
 
+## v0.7.0
+- distinct error and http status in api handlers
+- better api responses by content type
+- controller base: better error handling in invoke
+- api handlers: added support for api http verbs using request_method
+- independent db/repository configuration file
+- app environment implementation
+- automatic code reloading in development env (Shotgun)
+- added before hook in controllers and api-handlers
+- new routes specification file per app
+- code refactoring and bug fixes
+
 ## v0.6.1
 - sessions security improvements
 - added "x-frame-option: sameorigin" header to security improvement
