@@ -53,13 +53,15 @@ module Tzispa
       end
 
       def prepare_response(status, content = nil)
-        response.status = status if status.is_a?(Integer)
         if response.client_error?
           prepare_client_error(status)
         elsif response.server_error?
           prepare_server_error(status)
         elsif content
+          response.status = status if status.is_a?(Integer)
           response.body = content
+        elsif status.is_a?(Integer)
+          response.status = status
         end
       end
 
@@ -69,6 +71,7 @@ module Tzispa
 
       def prepare_client_error(status, error = nil)
         status.tap do |code|
+          response.status = status if status.is_a?(Integer)
           context.logger.info log_format(code, error.to_s) if error
           response.body = error_page(context.domain, status: code)
         end
@@ -76,6 +79,7 @@ module Tzispa
 
       def prepare_server_error(status, error = nil)
         status.tap do |code|
+          response.status = status if status.is_a?(Integer)
           context.logger.error log_format(code, error_log(error)) if error
           response.body = if error && Tzispa::Environment.development?
                             debug_info(error)
