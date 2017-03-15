@@ -23,8 +23,10 @@ module Tzispa
     def setup
       instance_eval 'load "./config/boot.rb"'
       @app = if code_reloading?
+               puts 'Tzispa is booting server with code reloading'
                Shotgun::Loader.new(rackup_file)
              else
+               puts 'Tzispa is booting server without code reloading'
                config = "Rack::Builder.new {( #{::File.read(rackup_file)}\n )}.to_app"
                instance_eval config, rackup_file
              end
