@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'tzispa_data',    '~> 0.4'
   s.add_dependency 'dotenv',         '~> 2.2'
 
-  s.add_development_dependency 'shotgun'
+  s.add_development_dependency 'shotgun', '~> 0.9'
 
   s.files         = Dir.glob('{lib,bin}/**/*') + %w(README.md CHANGELOG.md LICENSE tzispa.gemspec)
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
