@@ -80,7 +80,11 @@ module Tzispa
       end
 
       def message
-        I18n.t("#{self.class.name.dottize}.#{error}", default: error.to_s) if error
+        I18n.t(error_id, default: error.to_s) if error
+      end
+
+      def error_id
+        "#{self.class.name.dottize}.#{error}" if error
       end
 
       def run!(verb, predicate = nil)
