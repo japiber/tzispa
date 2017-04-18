@@ -41,12 +41,6 @@ module Tzispa
         @status = nil
       end
 
-      def result(type:, data: nil, error: nil)
-        @type = type
-        @data = data
-        @error = error
-      end
-
       class << self
         def before(*args)
           (@before_chain ||= []).tap do |bef|
@@ -59,7 +53,7 @@ module Tzispa
       end
 
       def error?
-        error && error != HANDLER_OK
+        @error && @error != HANDLER_OK
       end
 
       def error_status(error, status = nil)
@@ -67,12 +61,18 @@ module Tzispa
         @status = status
       end
 
-      def result_json(data, error: nil)
-        result type: :json, data: data, error: error
+      def result(type:, data: nil, error: nil)
+        @type = type
+        @data = data
+        @error = error if error
       end
 
-      def result_download(data, error: nil)
-        result type: :download, data: data, error: error
+      def result_json(data)
+        result type: :json, data: data
+      end
+
+      def result_download(data)
+        result type: :download, data: data
       end
 
       def not_found
