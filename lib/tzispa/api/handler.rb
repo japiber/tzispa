@@ -75,6 +75,10 @@ module Tzispa
         result type: :download, data: data
       end
 
+      def result_redirect(data)
+        result type: :redirect, data: data
+      end
+
       def not_found
         result type: :not_found
       end
