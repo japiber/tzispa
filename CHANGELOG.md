@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.7.1
+- ensure set response status in prepare_client/server_error
+- added result_redirect method in api handlers
+- bug fixes
+
 ## v0.7.0
 - distinct error and http status in api handlers
 - better api responses by content type
