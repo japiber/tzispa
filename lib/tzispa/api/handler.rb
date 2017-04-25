@@ -5,6 +5,8 @@ require 'json'
 require 'i18n'
 require 'tzispa/helpers/provider'
 require 'tzispa/helpers/sign_requirer'
+require 'tzispa/helpers/hooks/before'
+require 'tzispa/helpers/hooks/after'
 require 'tzispa/utils/string'
 
 module Tzispa
@@ -23,6 +25,8 @@ module Tzispa
 
       include Tzispa::Helpers::Provider
       include Tzispa::Helpers::SignRequirer
+      include Tzispa::Helpers::Hooks::Before
+      include Tzispa::Helpers::Hooks::After
 
       using Tzispa::Utils::TzString
 
@@ -39,17 +43,6 @@ module Tzispa
         @context = context
         @error = nil
         @status = nil
-      end
-
-      class << self
-        def before(*args)
-          (@before_chain ||= []).tap do |bef|
-            args.each do |s|
-              s = s.to_sym
-              bef << s unless bef.include?(s)
-            end
-          end
-        end
       end
 
       def error?
@@ -98,6 +91,7 @@ module Tzispa
         # process compound predicates
         args = predicate ? predicate.split(',') : nil
         send verb, *args
+        do_after
       end
 
       def redirect_url(url)
@@ -115,10 +109,6 @@ module Tzispa
                            context.router_params[:handler],
                            context.router_params[:verb],
                            context.router_params[:predicate]
-      end
-
-      def do_before
-        self.class.before.each { |hbef| send hbef }
       end
     end
 

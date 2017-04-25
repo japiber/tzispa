@@ -2,6 +2,8 @@
 
 require 'forwardable'
 require 'tzispa/helpers/error_view'
+require 'tzispa/helpers/hooks/before'
+require 'tzispa/helpers/hooks/after'
 require 'tzispa/http/context'
 require 'tzispa/environment'
 
@@ -12,6 +14,8 @@ module Tzispa
       extend Forwardable
 
       include Tzispa::Helpers::ErrorView
+      include Tzispa::Helpers::Hooks::Before
+      include Tzispa::Helpers::Hooks::After
 
       attr_reader :context, :application, :callmethod
       def_delegators :@context, :request, :response, :config,
@@ -28,23 +32,13 @@ module Tzispa
         response.finish
       end
 
-      class << self
-        def before(*args)
-          (@before_chain ||= []).tap do |bef|
-            args&.each do |s|
-              s = s.to_sym
-              bef << s unless bef.include?(s)
-            end
-          end
-        end
-      end
-
       private
 
       def invoke
         prepare_response catch(:halt) {
           do_before
           send callmethod
+          do_after
         }
       rescue Tzispa::Rig::NotFound => ex
         prepare_client_error(404, ex)
@@ -63,10 +57,6 @@ module Tzispa
         elsif status.is_a?(Integer)
           response.status = status
         end
-      end
-
-      def do_before
-        self.class.before.each { |hook| send hook }
       end
 
       def prepare_client_error(status, error = nil)
