@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.7.2
+- added before/after hooks in controllers and handlers
+
 ## v0.7.1
 - ensure set response status in prepare_client/server_error
 - added result_redirect method in api handlers
