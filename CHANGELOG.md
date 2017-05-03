@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.7.3
+- bug fix in controllers base prepare_response method
+
 ## v0.7.2
 - added before/after hooks in controllers and handlers
 
