@@ -64,9 +64,9 @@ module Tzispa
         app.class.synchronize do
           logging
           load_locales
+          repository&.load!(domain)
           domain.setup
           routes.setup
-          repository&.load!(domain)
         end
       end
     end
