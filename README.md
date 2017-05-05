@@ -21,25 +21,38 @@ Tzispa is composed by these frameworks:
 ## Usage
 
 ```shell
-% tzispa generate project myproject
-% cd myproject
-% tzispa generate app mainapp --host=www.mynewsite.com
-% puma start.ru
+% tzispa new myproject
 ```
 
-## Adding more apps
+## Adding apps
+
+```shell
+% cd myproject
+% tzispa generate app mainapp
+```
 
 Tzispa support multi-app projects. Each app must have a unique mount path
 
 ```shell
-% tzispa generate app adminapp --host=www.mynewsite.com --mount=admin
+% tzispa generate app adminapp --mount=admin
+```
+
+## Launch
+
+```shell
+% tzispa server
+```
+Starting app server daemonizing
+
+```shell
+% tzispa server --daemonize
 ```
 
 ## Adding templates
 
 There are 3 template types: layout, static and block:
 
-* layout: these are the skeleton entry points of the rig templates
+* layout: these are the skeleton entry points in the rig template engine
 * static: these are "light" templates that are a included without any processing as plain text
 * block: the true core of the rig templates, each block template file has an associated ruby file with the template binder class
 

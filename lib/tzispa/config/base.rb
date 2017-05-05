@@ -7,7 +7,7 @@ module Tzispa
 
     class Base < Struct
       def self.parametrize(params)
-        new(*params.keys.map(&:to_sym)).new(*(params.values.map do |v|
+        new(*params&.keys&.map(&:to_sym)).new(*(params&.values&.map do |v|
           v.is_a?(Hash) ? parametrize(v) : v
         end))
       end
