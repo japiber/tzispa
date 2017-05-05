@@ -31,9 +31,11 @@ module Tzispa
         generate_projectrc
         generate_environment
         generate_rackup
+        generate_gemfile
         generate_puma_config
+        generate_boot_config
         generate_gitignore
-        generate_i18n(%w(en es))
+        generate_i18n(%w[en es])
         generate_database_config
       end
 
@@ -71,9 +73,21 @@ module Tzispa
         end
       end
 
+      def generate_gemfile
+        File.open("#{name}/#{GEMFILE}", 'w') do |file|
+          file.puts GEMFILE_CONTENT
+        end
+      end
+
       def generate_puma_config
         File.open("#{name}/config/#{PUMA_CONFIG_FILE}", 'w') do |f|
           f.puts PUMA_CONFIG % name
+        end
+      end
+
+      def generate_boot_config
+        File.open("#{name}/config/#{BOOT_CONFIG_FILE}", 'w') do |f|
+          f.puts BOOT_CONFIG
         end
       end
 
