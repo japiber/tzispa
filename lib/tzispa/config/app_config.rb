@@ -47,7 +47,7 @@ module Tzispa
             log['enabled'] = true
             log['shift_age'] = 'daily'
           end
-          cfg['sessions'] = {}.tap { |ses| ses['enabled'] = true }
+          cfg['sessions'] = {}.tap { |ses| ses['enabled'] = false }
         end
         Tzispa::Config::Yaml.save(hcfg, filename)
         load!
