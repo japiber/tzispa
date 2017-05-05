@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.7.4
+- changed repository load order in app
+- tzispa commands bugs fix
+
 ## v0.7.3
 - bug fix in controllers base prepare_response method
 
