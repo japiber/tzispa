@@ -41,9 +41,9 @@ module Tzispa
 
         def create_default(path)
           hcfg = {}.tap do |cfg|
-            cfg['development'] = {}
-            cfg['deployment'] = {}
-            cfg['test'] = {}
+            cfg['development'] = ''
+            cfg['deployment'] = ''
+            cfg['test'] = ''
           end
           Yaml.save(hcfg, File.join(path, filename))
         end
