@@ -41,17 +41,17 @@ module Tzispa
           do_after
         }
       rescue Tzispa::Rig::NotFound => ex
-        prepare_client_error(404, ex)
+        prepare_response(404, error: ex)
       rescue StandardError, ScriptError, SecurityError => ex
-        prepare_server_error(500, ex)
+        prepare_response(500, error: ex)
       end
 
-      def prepare_response(status, content = nil)
+      def prepare_response(status, content: nil, error: nil)
         response.status = status if status.is_a?(Integer)
         if context.client_error?
-          prepare_client_error(status)
+          prepare_client_error(status, error)
         elsif context.server_error?
-          prepare_server_error(status)
+          prepare_server_error(status, error)
         elsif content
           response.body = content
         end
