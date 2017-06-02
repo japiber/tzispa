@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.7.5
+- bug fix in controller base response status code was not being set
+
 ## v0.7.4
 - changed repository load order in app
 - tzispa commands bugs fix
