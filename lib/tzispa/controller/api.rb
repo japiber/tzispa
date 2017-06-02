@@ -22,8 +22,7 @@ module Tzispa
         predicate = context.router_params[:predicate]
         handler = prepare_handler
         handler.run! verb, predicate
-        send(handler.type, handler) if handler.type
-        response.finish
+        send(handler.type || :empty, handler)
       end
 
       def prepare_handler
@@ -45,6 +44,10 @@ module Tzispa
         else
           request.referer
         end
+      end
+
+      def empty(handler)
+        api_response nil, nil, handler.status, handler.error
       end
 
       def redirect(handler)
@@ -80,9 +83,9 @@ module Tzispa
         context.flash << message if config.sessions&.enabled
       end
 
-      def api_response(type, content, status = nil, error = nil)
-        content_type type
-        response.body << content
+      def api_response(type = nil, content = nil, status = nil, error = nil)
+        content_type(type) if type
+        response.body = content if content
         response.status = status if status
         api_headers error
       end
