@@ -102,7 +102,7 @@ module Tzispa
         "#{canonical_root}#{app_layout_path(app_name, layout, params)}"
       end
 
-      def api(handler, verb, predicate, sufix, app_name = nil)
+      def api(handler, verb, predicate = nil, sufix = nil, app_name = nil)
         if app_name
           app_canonical_url app_name, :api, handler: handler, verb: verb,
                                             predicate: predicate, sufix: sufix
@@ -112,7 +112,7 @@ module Tzispa
         end
       end
 
-      def sapi(handler, verb, predicate, sufix, app_name = nil)
+      def sapi(handler, verb, predicate = nil, sufix = nil, app_name = nil)
         if app_name
           sign = sign_array [handler, verb, predicate], app[:app_name].config.salt
           app_canonical_url app_name, :sapi, sign: sign, handler: handler,
