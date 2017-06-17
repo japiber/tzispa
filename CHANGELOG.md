@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.7.6
+- added custom error pages option in base controller
+- disable custom error page in the api controller
+
 ## v0.7.5
 - bug fix in controller base response status code was not being set
 
