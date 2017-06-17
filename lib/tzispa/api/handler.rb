@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require 'json'
-require 'i18n'
 require 'tzispa/helpers/provider'
 require 'tzispa/helpers/sign_requirer'
 require 'tzispa/helpers/hooks/before'
 require 'tzispa/helpers/hooks/after'
-require 'tzispa/utils/string'
+require_relative 'handler_error'
 
 module Tzispa
   module Api
@@ -23,6 +21,7 @@ module Tzispa
     class Handler
       extend Forwardable
 
+      include Tzispa::Api::HandlerError
       include Tzispa::Helpers::Provider
       include Tzispa::Helpers::SignRequirer
       include Tzispa::Helpers::Hooks::Before
@@ -34,30 +33,15 @@ module Tzispa
       def_delegators :@context, :request, :response, :app, :repository,
                      :config, :logger, :unauthorized_but_logged, :login_redirect
 
-      attr_writer :error
-
-      HANDLER_OK                = :ok
-      HANDLER_MISSING_PARAMETER = :missing_parameter
-
       def initialize(context)
         @context = context
         @error = nil
         @status = nil
       end
 
-      def error?
-        @error && @error != HANDLER_OK
-      end
-
-      def error_status(error, status = nil)
-        @error = error
-        @status = status
-      end
-
-      def result(type:, data: nil, error: nil)
+      def result(type:, data: nil)
         @type = type
         @data = data
-        @error = error if error
       end
 
       def result_json(data)
@@ -72,17 +56,12 @@ module Tzispa
         result type: :redirect, data: data
       end
 
-      def not_found
-        result type: :not_found
+      def error_status(code, http_status = nil)
+        @error = code
+        @status = http_status
+        result_json error_message: message, error_code: code
       end
-
-      def message
-        I18n.t(error_id, default: error.to_s) if error
-      end
-
-      def error_id
-        "#{self.class.name.dottize}.#{error}" if error
-      end
+      alias result_error error_status
 
       def run!(verb, predicate = nil)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless provides? verb

@@ -17,6 +17,10 @@ module Tzispa
 
       include Tzispa::Helpers::Response
 
+      def initialize(app, callmethod = :dispatch!)
+        super(app, callmethod, false)
+      end
+
       def dispatch!
         verb = context.router_params[:verb]
         predicate = context.router_params[:predicate]
@@ -47,7 +51,7 @@ module Tzispa
       end
 
       def empty(handler)
-        api_response nil, nil, handler.status, handler.error
+        api_response handler.status
       end
 
       def redirect(handler)
@@ -56,23 +60,18 @@ module Tzispa
       end
 
       def html(handler)
-        content = handler.error? ? handler.message : handler.data
-        api_response :htm, content, handler.status, handler.error
+        content = handler.data unless handler.error?
+        api_response handler.status, content, :htm
       end
 
       def json(handler)
-        content = if handler.error?
-                    { error_message: handler.message,
-                      error_code: handler.error }.to_json
-                  else
-                    handler.data.is_a?(::String) ? JSON.parse(handler.data) : handler.data.to_json
-                  end
-        api_response :json, content, handler.status, handler.error
+        content = handler.data.is_a?(::String) ? JSON.parse(handler.data) : handler.data.to_json        
+        api_response handler.status, content, :json
       end
 
       def text(handler)
-        content = handler.error? ? handler.message : handler.data
-        api_response :text, content, handler.status, handler.error
+        content = handler.data unless handler.error?
+        api_response handler.status, content, :text
       end
 
       def download(handler)
@@ -83,11 +82,10 @@ module Tzispa
         context.flash << message if config.sessions&.enabled
       end
 
-      def api_response(type = nil, content = nil, status = nil, error = nil)
+      def api_response(status, content = nil, type = nil)
         content_type(type) if type
         response.body = content if content
         response.status = status if status
-        api_headers error
       end
 
       def request_method
@@ -112,16 +110,6 @@ module Tzispa
           "#{handler_namespace domain, request_method}::#{handler_class_name handler_name}"
             .constantize
         end
-      end
-
-      private
-
-      def api_headers(error = nil)
-        handler = context.router_params[:handler]
-        verb = context.router_params[:verb]
-        predicate = context.router_params[:predicate]
-        response['X-API'] = "#{handler}:#{verb}:#{predicate}"
-        response['X-API-SR'] = error.to_s if error
       end
     end
 

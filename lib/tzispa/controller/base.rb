@@ -17,13 +17,14 @@ module Tzispa
       include Tzispa::Helpers::Hooks::Before
       include Tzispa::Helpers::Hooks::After
 
-      attr_reader :context, :application, :callmethod
+      attr_reader :context, :application, :callmethod, :custom_error
       def_delegators :@context, :request, :response, :config,
                      :login_redirect, :unauthorized_but_logged
 
-      def initialize(app, callmethod = nil)
+      def initialize(app, callmethod = nil, custom_error = true)
         @callmethod = callmethod
         @application = app
+        @custom_error = custom_error
       end
 
       def call(env)
@@ -46,32 +47,32 @@ module Tzispa
         prepare_response(500, error: ex)
       end
 
-      def prepare_response(status, content: nil, error: nil)
+      def prepare_response(status, error: nil)
         response.status = status if status.is_a?(Integer)
         if context.client_error?
           prepare_client_error(status, error)
         elsif context.server_error?
           prepare_server_error(status, error)
-        elsif content
-          response.body = content
         end
       end
 
       def prepare_client_error(status, error = nil)
         status.tap do |code|
           context.logger.info log_format(code, error.to_s) if error
-          response.body = error_page(context.domain, status: code)
+          response.body = error_page(context.domain, status: code) if custom_error
         end
       end
 
       def prepare_server_error(status, error = nil)
         status.tap do |code|
           context.logger.error log_format(code, error_log(error)) if error
-          response.body = if error && Tzispa::Environment.development?
-                            debug_info(error)
-                          else
-                            error_page(context.domain, status: code)
-                          end
+          if custom_error
+            response.body = if error && Tzispa::Environment.development?
+                              debug_info(error)
+                            else
+                              error_page(context.domain, status: code)
+                            end
+          end
         end
       end
 
