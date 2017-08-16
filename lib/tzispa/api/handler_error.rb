@@ -15,7 +15,7 @@ module Tzispa
         @error && @error != HANDLER_OK
       end
 
-      def message
+      def error_message
         I18n.t(error_id, default: error.to_s) if error
       end
 
@@ -23,56 +23,56 @@ module Tzispa
         "#{self.class.name.dottize}.#{error}" if error
       end
 
-      def error_log(error)
-        context.logger.error "#{error}\n\n#{error.backtrace if error.respond_to?(:backtrace)}"
+      def error_log(e)
+        context.logger.error "[#{context.request.ip}] #{context.request.request_method} #{context.request.fullpath}\n#{e.backtrace.first}: #{e.message} (#{e.class})\n#{e.backtrace.drop(1).map { |s| "\t#{s}" }.join("\n") }"   
       end
 
-      def http_bad_request(msg = nil)
-        error_status msg || :bad_request, 400
+      def http_bad_request(code = nil)
+        error_status code || :bad_request, 400
       end
 
-      def http_unauthorized(msg = nil)
-        error_status msg || :unauthorized, 401
+      def http_unauthorized(code = nil)
+        error_status code || :unauthorized, 401
       end
 
-      def http_forbidden(msg = nil)
-        error_status msg || :forbidden, 403
+      def http_forbidden(code = nil)
+        error_status code || :forbidden, 403
       end
 
-      def http_not_found(msg = nil)
-        error_status msg || :not_found, 404
+      def http_not_found(code = nil)
+        error_status code || :not_found, 404
       end
 
-      def http_not_aceptable(msg = nil)
-        error_status msg || :not_acceptable, 406
+      def http_not_aceptable(code = nil)
+        error_status code || :not_acceptable, 406
       end
 
-      def http_conflict(msg = nil)
-        error_status msg || :conflict, 409
+      def http_conflict(code = nil)
+        error_status code || :conflict, 409
       end
 
-      def http_gone(msg = nil)
-        error_status msg || :gone, 410
+      def http_gone(code = nil)
+        error_status code || :gone, 410
       end
 
-      def http_token_required(msg = nil)
-        error_status msg || :token_required, 499
+      def http_token_required(code = nil)
+        error_status code || :token_required, 499
       end
 
-      def http_server_error(msg = nil)
-        error_status msg || :internal_server_error, 500
+      def http_server_error(code = nil)
+        error_status code || :internal_server_error, 500
       end
 
-      def http_not_implemented(msg = nil)
-        error_status msg || :not_implemented, 501
+      def http_not_implemented(code = nil)
+        error_status code || :not_implemented, 501
       end
 
-      def http_bad_gateway(msg = nil)
-        error_status msg || :bad_gateway, 502
+      def http_bad_gateway(code = nil)
+        error_status code || :bad_gateway, 502
       end
 
-      def http_service_unavailable(msg = nil)
-        error_status msg || :service_unavailable, 503
+      def http_service_unavailable(code = nil)
+        error_status code || :service_unavailable, 503
       end
 
     end

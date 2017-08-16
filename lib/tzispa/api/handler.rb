@@ -29,7 +29,7 @@ module Tzispa
 
       using Tzispa::Utils::TzString
 
-      attr_reader :context, :type, :data, :error, :status
+      attr_reader :context, :type, :data, :error, :rescue_hook, :status
       def_delegators :@context, :request, :response, :app, :repository,
                      :config, :logger, :unauthorized_but_logged, :login_redirect
 
@@ -37,6 +37,7 @@ module Tzispa
         @context = context
         @error = nil
         @status = nil
+        @rescue_hook = nil
       end
 
       def result(type:, data: nil)
@@ -56,20 +57,31 @@ module Tzispa
         result type: :redirect, data: data
       end
 
-      def error_status(code, http_status = nil)
-        @error = code
+      def error_status(error_code, http_status = nil)        
+        @error = error_code
         @status = http_status
-        result_json error_message: message, error_code: code
+        result_json error_message: error_message
       end
-      alias result_error error_status
+      # alias result_error error_status
+
+      def on_error(http_error, error_code = nil, logger = nil)
+        @rescue_hook = { logger: logger, error_code: error_code, http_error: http_error }
+      end
 
       def run!(verb, predicate = nil)
         raise UnknownHandlerVerb.new(verb, self.class.name) unless provides? verb
         raise InvalidSign if sign_required? && !sign_valid?
         do_before
-        # process compound predicates
-        args = predicate ? predicate.split(',') : nil
-        send verb, *args
+        begin
+          send verb, *(predicate&.split(','))
+        rescue => err
+          if rescue_hook
+            send(rescue_hook[:logger], err) if rescue_hook.include? :logger
+            send(rescue_hook[:http_error], rescue_hook[:error_code])
+          else
+            raise
+          end
+        end
         do_after
       end
 
