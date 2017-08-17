@@ -45,18 +45,6 @@ module Tzispa
         router_params&.fetch(:layout, nil)
       end
 
-      def login_redirect
-        redirect(layout_path(config.login_layout.to_sym), true, response) if login_redirect?
-      end
-
-      def login_redirect?
-        !logged? && (layout != config.login_layout)
-      end
-
-      def unauthorized_but_logged
-        not_authorized unless logged?
-      end
-
       def path(path_id, params = {})
         app.routes.path path_id, params
       end
@@ -126,6 +114,14 @@ module Tzispa
 
       def path_sign?(sign, *args)
         sign == sign_array(args, config.salt)
+      end
+
+      def error_log(ex, status = nil)
+        logger.error "E [#{request.ip}] #{request.request_method} #{request.fullpath} #{status || response.status}\n#{ex.backtrace.first}: #{ex.message} (#{ex.class})\n#{ex.backtrace.drop(1).map { |s| "\t#{s}" }.join("\n") }"
+      end
+
+      def info_log(ex, status = nil)
+        logger.info "I [#{request.ip}] #{request.request_method} #{request.fullpath} #{status || response.status}\n#{ex.backtrace.first}: #{ex.message} (#{ex.class})\n#{ex.backtrace.drop(1).map { |s| "\t#{s}" }.join("\n") }"
       end
 
       private

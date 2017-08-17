@@ -18,8 +18,7 @@ module Tzispa
       include Tzispa::Helpers::Hooks::After
 
       attr_reader :context, :application, :callmethod, :custom_error
-      def_delegators :@context, :request, :response, :config,
-                     :login_redirect, :unauthorized_but_logged
+      def_delegators :@context, :request, :response, :config
 
       def initialize(app, callmethod = nil, custom_error = true)
         @callmethod = callmethod
@@ -58,14 +57,14 @@ module Tzispa
 
       def prepare_client_error(status, error = nil)
         status.tap do |code|
-          context.logger.info log_format(code, error.to_s) if error
+          context.info_log(error, code) if error
           response.body = error_page(context.domain, status: code) if custom_error
         end
       end
 
       def prepare_server_error(status, error = nil)
         status.tap do |code|
-          context.logger.error log_format(code, error_log(error)) if error
+          context.error_log(error, code) if error
           if custom_error
             response.body = if error && Tzispa::Environment.development?
                               debug_info(error)
@@ -76,12 +75,6 @@ module Tzispa
         end
       end
 
-      def log_format(status, msg)
-        String.new.tap do |str|
-          str << "[#{context.request.ip} #{DateTime.now}] #{context.request.request_method}"
-          str << " #{context.request.fullpath} #{status}\n#{msg}"
-        end
-      end
     end
 
   end
