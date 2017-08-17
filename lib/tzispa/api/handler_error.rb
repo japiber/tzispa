@@ -23,10 +23,6 @@ module Tzispa
         "#{self.class.name.dottize}.#{error}" if error
       end
 
-      def error_log(e)
-        context.logger.error "[#{context.request.ip}] #{context.request.request_method} #{context.request.fullpath}\n#{e.backtrace.first}: #{e.message} (#{e.class})\n#{e.backtrace.drop(1).map { |s| "\t#{s}" }.join("\n") }"   
-      end
-
       def http_bad_request(code = nil)
         error_status code || :bad_request, 400
       end

@@ -31,7 +31,7 @@ module Tzispa
 
       attr_reader :context, :type, :data, :error, :rescue_hook, :status
       def_delegators :@context, :request, :response, :app, :repository,
-                     :config, :logger, :unauthorized_but_logged, :login_redirect
+                     :config, :logger, :error_log, :info_log
 
       def initialize(context)
         @context = context
@@ -57,7 +57,7 @@ module Tzispa
         result type: :redirect, data: data
       end
 
-      def error_status(error_code, http_status = nil)        
+      def error_status(error_code, http_status = nil)
         @error = error_code
         @status = http_status
         result_json error_message: error_message
