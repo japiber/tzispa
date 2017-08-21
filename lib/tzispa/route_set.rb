@@ -51,20 +51,20 @@ module Tzispa
     end
 
     def index(path, controller: nil, methods: nil)
-      add :index, path, controller || 'layout:render!', methods: methods
-    end
-
-    def api(path, controller: nil, methods: nil)
-      add :api, path, controller || 'api:dispatch!', methods: methods
-    end
-
-    def signed_api(path, controller: nil, methods: nil)
-      add :sapi, path, controller || 'api:dispatch!', methods: methods
+      add :index, path, controller || 'layout', methods: methods
     end
 
     def layout(layout, path, controller: nil, methods: nil)
-      add layout, path, controller || 'layout:render!', methods: methods,
-                                                        matching: { layout: layout.to_s }
+      add layout, path, controller || 'layout', methods: methods,
+                                                matching: { layout: layout.to_s }
+    end
+
+    def api(path, controller: nil, methods: nil)
+      add :api, path, controller || 'api', methods: methods
+    end
+
+    def signed_api(path, controller: nil, methods: nil)
+      add :sapi, path, controller || 'api', methods: methods
     end
 
     private
@@ -81,7 +81,11 @@ module Tzispa
     def build_controller(controller)
       spec_control, callmethod = controller.to_s.split(':')
       mpath = spec_control.split('#')
-      controller_class(mpath).new(app, callmethod)
+      if callmethod
+        controller_class(mpath).new(app, callmethod)
+      else
+        controller_class(mpath).new(app)
+      end
     end
 
     def controller_class(mpath)

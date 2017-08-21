@@ -13,18 +13,17 @@ module Tzispa
       include Tzispa::Helpers::Hooks::Before
       include Tzispa::Helpers::Hooks::After
 
-      attr_reader :application, :context, :context_class, :callmethod, :custom_error
+      attr_reader :application, :context, :context_class, :callmethod
 
-      def initialize(app, callmethod = nil, custom_error = true, context_class = Tzispa::Context)
-        @callmethod = callmethod
+      def initialize(app, callmethod, context_class = Tzispa::Context)
         @application = app
-        @custom_error = custom_error
+        @callmethod = callmethod
         @context_class = context_class
       end
 
       def call(env)
         @context = context_class.new(application, env)
-        invoke if callmethod
+        invoke
       end
 
       private

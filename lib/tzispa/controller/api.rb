@@ -18,8 +18,8 @@ module Tzispa
 
       include Tzispa::Helpers::Response
 
-      def initialize(app, callmethod = :dispatch!, custom_error = true)
-        super app, callmethod, custom_error, Tzispa::Http::RigContext
+      def initialize(app)
+        super app, :dispatch!, Tzispa::Http::RigContext, false
       end
 
       def dispatch!
