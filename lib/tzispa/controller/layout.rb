@@ -11,8 +11,8 @@ module Tzispa
     class Layout < Tzispa::Controller::Http
       include Tzispa::Helpers::Response
 
-      def initialize(app, callmethod = :render!, custom_error = true, context_class = Tzispa::Http::RigContext)
-        super
+      def initialize(app, callmethod = :render!, custom_error = true)
+        super app, callmethod, custom_error, Tzispa::Http::RigContext
       end
 
       def render!

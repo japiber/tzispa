@@ -18,10 +18,10 @@ module Tzispa
 
       include Tzispa::Helpers::Response
 
-      def initialize(app, callmethod = :dispatch!, custom_error = true, context_class = Tzispa::Http::RigContext)
-        super
+      def initialize(app, callmethod = :dispatch!, custom_error = true)
+        super app, callmethod, custom_error, Tzispa::Http::RigContext
       end
-      
+
       def dispatch!
         verb = context.router_params[:verb]
         predicate = context.router_params[:predicate]
