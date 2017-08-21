@@ -2,25 +2,26 @@
 
 require 'json'
 require 'tzispa/domain'
-require 'tzispa/controller/base'
+require 'tzispa/controller/http'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
 require 'tzispa/utils/string'
+require 'tzispa/http/rig_context'
 
 module Tzispa
   module Controller
 
     class ControllerException < StandardError; end
 
-    class Api < Base
+    class Api < Tzispa::Controller::Http
       using Tzispa::Utils::TzString
 
       include Tzispa::Helpers::Response
 
-      def initialize(app, callmethod = :dispatch!)
-        super(app, callmethod, false)
+      def initialize(app, callmethod = :dispatch!, custom_error = true, context_class = Tzispa::Http::RigContext)
+        super
       end
-
+      
       def dispatch!
         verb = context.router_params[:verb]
         predicate = context.router_params[:predicate]
@@ -65,7 +66,7 @@ module Tzispa
       end
 
       def json(handler)
-        content = handler.data.is_a?(::String) ? JSON.parse(handler.data) : handler.data.to_json        
+        content = handler.data.is_a?(::String) ? JSON.parse(handler.data) : handler.data.to_json
         api_response handler.status, content, :json
       end
 

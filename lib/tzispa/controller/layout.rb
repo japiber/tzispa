@@ -1,14 +1,19 @@
 # frozen_string_literal: true
 
 require 'tzispa_rig'
-require 'tzispa/controller/base'
+require 'tzispa/controller/http'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
+require 'tzispa/http/rig_context'
 
 module Tzispa
   module Controller
-    class Layout < Base
+    class Layout < Tzispa::Controller::Http
       include Tzispa::Helpers::Response
+
+      def initialize(app, callmethod = :render!, custom_error = true, context_class = Tzispa::Http::RigContext)
+        super
+      end
 
       def render!
         rig = Tzispa::Rig::Engine.layout name: layout_name,
@@ -19,6 +24,12 @@ module Tzispa
       end
 
       private
+
+      def invoke
+        super
+      rescue Tzispa::Rig::NotFound => ex
+        prepare_response(404, error: ex)
+      end
 
       def layout_name
         context.layout || config.default_layout

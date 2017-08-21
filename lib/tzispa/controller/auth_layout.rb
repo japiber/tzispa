@@ -6,7 +6,7 @@ require 'tzispa/helpers/login'
 module Tzispa
   module Controller
 
-    class AuthLayout < Layout
+    class AuthLayout < Tzispa::Controller::Layout
       include Tzispa::Helpers::Login
 
       before :login_redirect
