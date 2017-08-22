@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'tzispa/template/rig/router'
+require 'tzispa/engine/rig/router'
 
 module Tzispa
-  module Template
+  module Engine
 
-    def template_rig_routes(app, map_path)
+    def rig_routes(app, map_path)
       Rig::Router.new(app, map_path).setup
     end
 

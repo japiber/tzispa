@@ -4,7 +4,7 @@ require 'tzispa/http/context'
 require 'tzispa/helpers/security'
 
 module Tzispa
-  module Template
+  module Engine
     module Rig
 
       class Context < Tzispa::Http::Context

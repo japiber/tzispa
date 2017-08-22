@@ -3,12 +3,12 @@
 require 'tzispa/route_set'
 
 module Tzispa
-  module Template
+  module Engine
     module Rig
 
       class Router < Tzispa::RouteSet
         def initialize(app, root = nil)
-          super app, root, 'Tzispa::Template::Rig'
+          super app, root, 'Tzispa::Engine::Rig'
         end
 
         def index(path, controller: nil, methods: nil)

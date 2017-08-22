@@ -6,7 +6,7 @@ require 'i18n'
 require 'tzispa/domain'
 require 'tzispa/config/app_config'
 require 'tzispa/config/db_config'
-require 'tzispa/template'
+require 'tzispa/engine'
 require 'tzispa_data'
 
 module Tzispa
@@ -14,7 +14,7 @@ module Tzispa
   class Application
     extend Forwardable
 
-    include Tzispa::Template
+    include Tzispa::Engine
 
     attr_reader :domain, :logger, :map_path, :engine, :routes
     def_delegators :@domain, :name, :path
@@ -94,7 +94,7 @@ module Tzispa
     private
 
     def routes_setup
-      @routes = send :"template_#{engine}_routes", self, map_path
+      @routes = send :"#{engine}_routes", self, map_path
     end
 
     def logging_setup

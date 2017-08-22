@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
-require 'tzispa/template/rig/layout'
+require 'tzispa/engine/rig/layout'
 require 'tzispa/helpers/login'
 
 module Tzispa
-  module Template
+  module Engine
     module Rig
 
-
-      class AuthLayout < Tzispa::Template::Rig::Layout
+      class AuthLayout < Tzispa::Engine::Rig::Layout
         include Tzispa::Helpers::Login
 
         before :login_redirect

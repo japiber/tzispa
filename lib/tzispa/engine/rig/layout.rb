@@ -4,17 +4,17 @@ require 'tzispa_rig'
 require 'tzispa/controller/http'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
-require 'tzispa/template/rig/context'
+require 'tzispa/engine/rig/context'
 
 module Tzispa
-  module Template
+  module Engine
     module Rig
 
       class Layout < Tzispa::Controller::Http
         include Tzispa::Helpers::Response
 
         def initialize(app)
-          super app, :render!, Tzispa::Template::Rig::Context, true
+          super app, :render!, Tzispa::Engine::Rig::Context, true
         end
 
         def render!
@@ -27,9 +27,9 @@ module Tzispa
         private
 
         def layout_template
-          Tzispa::Rig::Engine.layout name: layout_name,
-                                     domain: application.domain,
-                                     content_type: context.router_params[:format] ||
+          Tzispa::Rig::Factory.layout name: layout_name,
+                                      domain: application.domain,
+                                      content_type: context.router_params[:format] ||
                                                    config.default_format
         end
 

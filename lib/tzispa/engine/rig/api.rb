@@ -6,10 +6,10 @@ require 'tzispa/controller/http'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
 require 'tzispa/utils/string'
-require 'tzispa/template/rig/context'
+require 'tzispa/engine/rig/context'
 
 module Tzispa
-  module Template
+  module Engine
     module Rig
 
       class ControllerException < StandardError; end
@@ -20,7 +20,7 @@ module Tzispa
         include Tzispa::Helpers::Response
 
         def initialize(app)
-          super app, :dispatch!, Tzispa::Template::Rig::Context, false
+          super app, :dispatch!, Tzispa::Engine::Rig::Context, false
         end
 
         def dispatch!
