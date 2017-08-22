@@ -7,6 +7,11 @@ module Tzispa
     module Rig
 
       class Router < Tzispa::RouteSet
+
+        def initialize(app, root = nil)
+          super app, root, 'Tzispa::Template::Rig'
+        end
+
         def index(path, controller: nil, methods: nil)
           add :index, path, controller || 'layout', methods: methods
         end

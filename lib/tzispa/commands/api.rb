@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
-require 'tzispa/controller/api'
+require 'tzispa/template/rig/api'
 require 'tzispa/commands/command'
 require 'tzispa/utils/indenter'
 
@@ -19,10 +19,10 @@ module Tzispa
       end
 
       def generate
-        file_name = Tzispa::Controller::Api.handler_class_file(domain, name, verb)
+        file_name = Tzispa::Template::Rig::Api.handler_class_file(domain, name, verb)
         raise "The handler '#{name}' already exist" if File.exist?(file_name)
-        namespace = Tzispa::Controller::Api.handler_namespace(domain, verb)
-        class_name = Tzispa::Controller::Api.handler_class_name(name)
+        namespace = Tzispa::Template::Rig::Api.handler_namespace(domain, verb)
+        class_name = Tzispa::Template::Rig::Api.handler_class_name(name)
         create_file file_name, namespace, class_name
       end
 
