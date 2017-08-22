@@ -2,6 +2,11 @@ Tzispa
 
 General purpose web framework
 
+## v0.8.0
+- introducing support for other template engines
+- improve errors log
+- bugs fixes
+
 ## v0.7.6
 - added custom error pages option in base controller
 - disable custom error page in the api controller
