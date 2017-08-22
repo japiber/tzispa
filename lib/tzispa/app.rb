@@ -63,8 +63,8 @@ module Tzispa
     def load!
       tap do |app|
         app.class.synchronize do
-          logging
-          load_locales
+          logging_setup
+          locales_setup
           repository&.load!(domain)
           domain.setup
           routes_setup
@@ -76,16 +76,8 @@ module Tzispa
       self.class[domain]
     end
 
-    def default_layout?(layout)
-      config.default_layout.to_sym == layout
-    end
-
     def env
       Tzispa::Environment.instance
-    end
-
-    def routes_setup
-      @routes = send :"template_#{engine}_routes", self, map_path
     end
 
     def config
@@ -101,13 +93,17 @@ module Tzispa
 
     private
 
-    def logging
+    def routes_setup
+      @routes = send :"template_#{engine}_routes", self, map_path
+    end
+
+    def logging_setup
       return unless config&.logging&.enabled
       @logger = Logger.new("logs/#{domain.name}.log", config.logging&.shift_age)
       @logger.level = Tzispa::Environment.development? ? Logger::DEBUG : Logger::INFO
     end
 
-    def load_locales
+    def locales_setup
       return unless config.respond_to?(:locales)
       I18n.enforce_available_locales = false
       I18n.load_path += Dir['config/locales/*.yml', "#{domain.path}/locales/*.yml"]

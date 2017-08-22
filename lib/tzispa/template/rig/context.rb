@@ -14,8 +14,12 @@ module Tzispa
           router_params&.fetch(:layout, nil)
         end
 
+        def default_layout?(layout)
+          config.default_layout&.to_sym == layout
+        end
+
         def layout_path(layout, params = {})
-          is_default = app.default_layout? layout
+          is_default = default_layout? layout
           params = normalize_format(params.merge(layout: layout)) unless is_default
           app.routes.path layout, params
         end
