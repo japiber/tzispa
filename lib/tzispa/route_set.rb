@@ -26,6 +26,7 @@ module Tzispa
         contents = File.read(routes_definitions)
         instance_eval(contents, File.basename(routes_definitions), 0)
       end
+      self
     end
 
     def routes_definitions
@@ -48,23 +49,6 @@ module Tzispa
 
     def draw
       yield if block_given?
-    end
-
-    def index(path, controller: nil, methods: nil)
-      add :index, path, controller || 'layout', methods: methods
-    end
-
-    def layout(layout, path, controller: nil, methods: nil)
-      add layout, path, controller || 'layout', methods: methods,
-                                                matching: { layout: layout.to_s }
-    end
-
-    def api(path, controller: nil, methods: nil)
-      add :api, path, controller || 'api', methods: methods
-    end
-
-    def signed_api(path, controller: nil, methods: nil)
-      add :sapi, path, controller || 'api', methods: methods
     end
 
     private

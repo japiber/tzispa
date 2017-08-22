@@ -6,7 +6,7 @@ require 'tzispa/controller/http'
 require 'tzispa/controller/exceptions'
 require 'tzispa/helpers/response'
 require 'tzispa/utils/string'
-require 'tzispa/http/rig_context'
+require 'tzispa/template/rig/context'
 
 module Tzispa
   module Controller
@@ -19,7 +19,7 @@ module Tzispa
       include Tzispa::Helpers::Response
 
       def initialize(app)
-        super app, :dispatch!, Tzispa::Http::RigContext, false
+        super app, :dispatch!, Tzispa::Template::Rig::Context, false
       end
 
       def dispatch!

@@ -4,9 +4,9 @@ require 'forwardable'
 require 'logger'
 require 'i18n'
 require 'tzispa/domain'
-require 'tzispa/route_set'
 require 'tzispa/config/app_config'
 require 'tzispa/config/db_config'
+require 'tzispa/template'
 require 'tzispa_data'
 
 module Tzispa
@@ -14,10 +14,10 @@ module Tzispa
   class Application
     extend Forwardable
 
-    attr_reader :domain, :logger, :map_path
+    include Tzispa::Template
 
+    attr_reader :domain, :logger, :map_path, :engine, :routes
     def_delegators :@domain, :name, :path
-    def_delegators :@routes, :routing, :index, :api, :signed_api, :layout
 
     class << self
       alias __new__ :new
@@ -49,9 +49,10 @@ module Tzispa
       end
     end
 
-    def initialize(appid, on: nil, &block)
+    def initialize(appid, engine:, on: nil, &block)
       @domain = Domain.new(appid)
       @map_path = on
+      @engine = engine
       instance_eval(&block) if block
     end
 
@@ -66,7 +67,7 @@ module Tzispa
           load_locales
           repository&.load!(domain)
           domain.setup
-          routes.setup
+          routes_setup
         end
       end
     end
@@ -83,8 +84,8 @@ module Tzispa
       Tzispa::Environment.instance
     end
 
-    def routes
-      @routes ||= RouteSet.new(self, map_path)
+    def routes_setup
+      @routes = send :"template_#{engine}_routes", self, map_path
     end
 
     def config
