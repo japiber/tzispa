@@ -38,13 +38,13 @@ module Tzispa
 
       def handler_code(namespace, class_name)
         Tzispa::Utils::Indenter.new.tap do |code|
-          code << "require 'tzispa/api/handler'\n\n"
+          code << "require 'tzispa/rig/handler'\n\n"
           level = 0
           namespace.split('::').each do |ns|
             level.positive? ? code.indent << "module #{ns}\n" : code << "module #{ns}\n"
             level += 1
           end
-          code.indent << "\nclass #{class_name} < Tzispa::Api::Handler\n\n"
+          code.indent << "\nclass #{class_name} < Tzispa::Rig::Handler\n\n"
           code << "end\n\n"
           namespace.split('::').each { code.unindent << "end\n" }
         end.to_s
