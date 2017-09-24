@@ -6,58 +6,16 @@ require 'singleton'
 require 'tzispa/env'
 require 'tzispa/tzisparc'
 require 'tzispa/utils/hash'
+require 'tzispa/config/environment'
 
 module Tzispa
 
   class Environment
     include Singleton
+    include Tzispa::Config::Environment
     using Tzispa::Utils::TzHash
 
     LOCK = Mutex.new
-
-    RACK_ENV = 'RACK_ENV'
-
-    TZISPA_ENV = 'TZISPA_ENV'
-
-    DEVELOPMENT_ENV = 'development'
-
-    DEFAULT_ENV = 'development'
-
-    PRODUCTION_ENV = 'deployment'
-
-    RACK_ENV_DEPLOYMENT = 'deployment'
-
-    DEFAULT_DOTENV_ENV = '.env.%s'
-
-    DEFAULT_CONFIG = 'config'
-
-    TZISPA_HOST = 'TZISPA_HOST'
-
-    TZISPA_SSL = 'TZISPA_SSL'
-
-    TZISPA_SERVER_HOST = 'TZISPA_SERVER_HOST'
-
-    DEFAULT_HOST = 'localhost'
-
-    TZISPA_PORT = 'TZISPA_PORT'
-
-    TZISPA_SERVER_PORT = 'TZISPA_SERVER_PORT'
-
-    DEFAULT_PORT = 9412
-
-    DEFAULT_RACKUP = 'tzispa.ru'
-
-    DEFAULT_ENVIRONMENT_CONFIG = 'environment'
-
-    DEFAULT_DOMAINS_PATH = 'apps'
-
-    DOMAINS = 'domains'
-
-    DOMAINS_PATH = 'apps/%s'
-
-    APPLICATION = 'application'
-
-    APPLICATION_PATH = 'app'
 
     # rubocop:disable Style/ClassVars
     @@opts = {}
@@ -69,20 +27,32 @@ module Tzispa
       LOCK.synchronize { set_env_vars! }
     end
 
-    def self.opts=(hash)
-      @@opts = hash.to_h.dup
-    end
+    class << self
+      def opts=(hash)
+        @@opts = hash.to_h.dup
+      end
 
-    def self.[](key)
-      instance[key]
-    end
+      def [](key)
+        instance[key]
+      end
 
-    def self.development?
-      instance.development?
+      def method_missing(name, *args, &block)
+        if instance.respond_to? name
+          instance.send name, *args, &block
+        elsif instance.key? ekup = name.to_s.upcase
+          instance[ekup]
+        else
+          super
+        end
+      end
     end
 
     def [](key)
       @env[key]
+    end
+
+    def key?(key)
+      @env.key? key
     end
 
     def environment
@@ -105,19 +75,23 @@ module Tzispa
       [:default, environment.to_sym]
     end
 
+    def root
+      @root ||= Pathname.new(Dir.pwd)
+    end
+
+    def config
+      @config ||= root.join(@options.fetch(:config) { DEFAULT_CONFIG })
+    end
+
     def project_name
       @options.fetch(:project)
     end
 
     def architecture
       @options.fetch(:architecture) do
-        puts "Tzispa architecture unknown: see `.tzisparc'"
+        warn "Tzispa architecture unknown: see `.tzisparc'"
         exit 1
       end
-    end
-
-    def root
-      @root ||= Pathname.new(Dir.pwd)
     end
 
     def apps_path
@@ -129,10 +103,6 @@ module Tzispa
           APPLICATION_PATH
         end
       end
-    end
-
-    def config
-      @config ||= root.join(@options.fetch(:config) { DEFAULT_CONFIG })
     end
 
     def host

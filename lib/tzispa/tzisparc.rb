@@ -2,29 +2,16 @@
 
 require 'pathname'
 require 'tzispa/utils/hash'
+require 'tzispa/config/rc'
 
 module Tzispa
 
   class Tzisparc
     using Tzispa::Utils::TzHash
 
+    include Tzispa::Config::Rc
+
     FILE_NAME = '.tzisparc'
-
-    DEFAULT_ARCHITECTURE = 'domains'
-
-    APP_ARCHITECTURE = 'app'
-
-    ARCHITECTURE_KEY = 'architecture'
-
-    PROJECT_NAME = 'project'
-
-    DEFAULT_TEST_SUITE = 'minitest'
-
-    TEST_KEY = 'test'
-
-    DEFAULT_TEMPLATE = 'rig'
-
-    TEMPLATE_KEY = 'template'
 
     SEPARATOR = '='
 
@@ -39,8 +26,7 @@ module Tzispa
     def default_options
       @default_options ||= { ARCHITECTURE_KEY => DEFAULT_ARCHITECTURE,
                              PROJECT_NAME     => project_name,
-                             TEST_KEY         => DEFAULT_TEST_SUITE,
-                             TEMPLATE_KEY     => DEFAULT_TEMPLATE }
+                             TEST_KEY         => DEFAULT_TEST_SUITE }
     end
 
     def exists?

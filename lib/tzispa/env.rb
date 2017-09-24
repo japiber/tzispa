@@ -17,6 +17,10 @@ module Tzispa
       @env[key] = value
     end
 
+    def key?(key)
+      @env.key? key
+    end
+
     def load!(path)
       return unless defined?(Dotenv)
 
