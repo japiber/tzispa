@@ -16,6 +16,8 @@ module Tzispa
 
     include Tzispa::Engine
 
+    @@appmutex = Mutex.new
+
     attr_reader :domain, :logger, :map_path, :engine, :routes
     def_delegators :@domain, :name, :path
 
@@ -28,13 +30,10 @@ module Tzispa
 
       # rubocop:disable Style/ClassVars
       def applications
+        return __applications_container if @@appmutex.locked?
         synchronize do
-          @@applications ||= Hash.new { |_, key| raise UnknownApplication(key.to_s) }
+          __applications_container
         end
-      end
-
-      def synchronize
-        Mutex.new.synchronize { yield }
       end
 
       def [](name)
@@ -46,6 +45,16 @@ module Tzispa
           raise DuplicateDomain.new(app.name) if applications.key?(app.name)
           applications[app.name] = app
         end
+      end
+
+      def synchronize
+        @@appmutex.synchronize { yield }
+      end
+
+      private
+
+      def __applications_container
+        @@applications ||= Hash.new { |_, key| raise UnknownApplication(key.to_s) }
       end
     end
 
