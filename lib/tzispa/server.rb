@@ -54,8 +54,8 @@ module Tzispa
       {
         environment: env.environment,
         config:      rackup_file,
-        Host:        env.server_host,
-        Port:        env.server_port,
+        # Host:        env.server_host,
+        # Port:        env.server_port,
         AccessLog:   []
       }
     end
