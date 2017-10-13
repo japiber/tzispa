@@ -2,7 +2,7 @@
 
 require 'yaml'
 require 'http_router'
-require 'tzispa/utils/string'
+require 'tzispa_utils'
 require 'tzispa/controller/http_error'
 
 module Tzispa

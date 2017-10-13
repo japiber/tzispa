@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require 'tzispa/utils/hash'
+require 'tzispa_utils'
 require 'tzispa/config/rc'
 
 module Tzispa
