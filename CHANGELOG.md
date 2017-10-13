@@ -2,6 +2,12 @@ Tzispa
 
 General purpose web framework
 
+## v0.8.1
+- rig api handler moved to tzispa_rig gem
+- environment constants refactoring & improves env key access throught method_missing
+- fix applocation global mutext for apps boot & initialization
+- postpone server bind host/port to the Puma web server configuration phase
+
 ## v0.8.0
 - introducing support for other template engines
 - improve errors log
