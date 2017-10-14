@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'tzispa_rig'
+require 'tzispa_helpers'
 require 'tzispa/controller/http'
 require 'tzispa/controller/exceptions'
-require 'tzispa/helpers/response'
 require 'tzispa/engine/rig/context'
 
 module Tzispa

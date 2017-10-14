@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'tzispa/helpers/hooks/before'
-require 'tzispa/helpers/hooks/after'
+require 'tzispa_helpers'
 require 'tzispa/environment'
 require 'tzispa/context'
 

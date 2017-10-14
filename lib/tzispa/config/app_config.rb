@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'tzispa/config/yaml'
-require 'tzispa/helpers/security'
+require 'tzispa_helpers'
 
 module Tzispa
   module Config

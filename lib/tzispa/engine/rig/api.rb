@@ -4,7 +4,7 @@ require 'json'
 require 'tzispa/domain'
 require 'tzispa/controller/http'
 require 'tzispa/controller/exceptions'
-require 'tzispa/helpers/response'
+require 'tzispa_helpers'
 require 'tzispa_utils'
 require 'tzispa/engine/rig/context'
 

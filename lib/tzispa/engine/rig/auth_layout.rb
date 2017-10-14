@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'tzispa/engine/rig/layout'
-require 'tzispa/helpers/session_auth'
+require 'tzispa_helpers'
 
 module Tzispa
   module Engine

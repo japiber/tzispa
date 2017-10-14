@@ -4,8 +4,7 @@ require 'forwardable'
 require 'tzispa/context'
 require 'tzispa/http/response'
 require 'tzispa/http/request'
-require 'tzispa/helpers/response'
-require 'tzispa/helpers/session'
+require 'tzispa_helpers'
 
 module Tzispa
   module Http

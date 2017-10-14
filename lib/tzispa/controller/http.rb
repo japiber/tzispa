@@ -1,5 +1,5 @@
 require 'forwardable'
-require 'tzispa/helpers/error_view'
+require 'tzispa_helpers'
 require 'tzispa/controller/base'
 require 'tzispa/http/context'
 

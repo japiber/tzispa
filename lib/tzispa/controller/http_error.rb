@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'tzispa/controller/base'
-require 'tzispa/helpers/response'
+require 'tzispa_helpers'
 
 module Tzispa
   module Controller
