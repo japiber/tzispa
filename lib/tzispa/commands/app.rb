@@ -2,8 +2,7 @@
 
 require 'json'
 require 'tzispa/domain'
-require 'tzispa/utils/string'
-require 'tzispa/utils/indenter'
+require 'tzispa_utils'
 require 'tzispa/config/app_config'
 require 'tzispa/commands/command'
 

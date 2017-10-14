@@ -29,7 +29,7 @@ end
         ENTITY_TEMPLATE = <<-ENTTTPL
 # frozen_string_literal: true
 
-require 'tzispa/utils/decorator'
+require 'tzispa_utils'
 
 module %s
   module Entity

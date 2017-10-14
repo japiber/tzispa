@@ -5,7 +5,7 @@ require 'pathname'
 require 'singleton'
 require 'tzispa/env'
 require 'tzispa/tzisparc'
-require 'tzispa/utils/hash'
+require 'tzispa_utils'
 require 'tzispa/config/environment'
 
 module Tzispa

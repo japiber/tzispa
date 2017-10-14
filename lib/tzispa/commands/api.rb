@@ -3,7 +3,7 @@
 require 'fileutils'
 require 'tzispa/engine/rig/api'
 require 'tzispa/commands/command'
-require 'tzispa/utils/indenter'
+require 'tzispa_utils'
 
 module Tzispa
   module Commands
