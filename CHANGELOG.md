@@ -2,6 +2,9 @@ Tzispa
 
 General purpose web framework
 
+## v0.8.3
+- refactoring for tzispa_helpers autoloading
+
 ## v0.8.1
 - rig api handler moved to tzispa_rig gem
 - environment constants refactoring & improves env key access throught method_missing
