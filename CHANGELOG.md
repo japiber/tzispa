@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.9.0
+- configuration moved into tzispa_config gem
+- refactoring for new singleton Repository
+
 ## v0.8.3
 - refactoring for tzispa_helpers autoloading
 
