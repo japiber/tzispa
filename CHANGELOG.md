@@ -2,6 +2,10 @@ Tzispa
 
 General purpose web framework
 
+## v0.9.1
+- updated dependencies versions
+- bug fix for old app_config requiring
+
 ## v0.9.0
 - configuration moved into tzispa_config gem
 - refactoring for new singleton Repository
