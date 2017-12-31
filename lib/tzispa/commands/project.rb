@@ -5,7 +5,7 @@ require 'base64'
 require 'zlib'
 require 'pathname'
 require 'tzispa/tzisparc'
-require 'tzispa/environment'
+require 'tzispa_config'
 require 'tzispa_helpers'
 require 'tzispa/commands/helpers/project'
 require 'tzispa/commands/helpers/i18n'
@@ -92,7 +92,7 @@ module Tzispa
       end
 
       def generate_database_config
-        Tzispa::Config::DbConfig.create_default name
+        Tzispa::Data::Config.create_default name
       end
 
       def generate_boot

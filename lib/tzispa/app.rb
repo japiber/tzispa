@@ -5,7 +5,6 @@ require 'logger'
 require 'i18n'
 require 'tzispa/domain'
 require 'tzispa/config/app_config'
-require 'tzispa/config/db_config'
 require 'tzispa/engine'
 require 'tzispa_data'
 
@@ -16,6 +15,7 @@ module Tzispa
 
     include Tzispa::Engine
 
+    # rubocop:disable Style/ClassVars
     @@appmutex = Mutex.new
 
     attr_reader :domain, :logger, :map_path, :engine, :routes
@@ -28,7 +28,6 @@ module Tzispa
         __new__(*args, &block).tap { |app| add app }
       end
 
-      # rubocop:disable Style/ClassVars
       def applications
         return __applications_container if @@appmutex.locked?
         synchronize do
@@ -57,6 +56,7 @@ module Tzispa
         @@applications ||= Hash.new { |_, key| raise UnknownApplication(key.to_s) }
       end
     end
+    # rubocop:enable Style/ClassVars
 
     def initialize(appid, engine:, on: nil, &block)
       @domain = Domain.new(appid)
@@ -74,7 +74,7 @@ module Tzispa
         app.class.synchronize do
           logging_setup
           locales_setup
-          repository&.load!(domain)
+          Data::Repository.load!(domain)
           domain.setup
           routes_setup
         end
@@ -86,18 +86,11 @@ module Tzispa
     end
 
     def env
-      Tzispa::Environment.instance
+      Environment.instance
     end
 
     def config
       @config ||= Config::AppConfig.new(@domain).load!
-    end
-
-    def repository
-      @repository ||= begin
-        dbcfg = Config::DbConfig.new(env.environment)&.to_h
-        Data::Repository.new(dbcfg) if dbcfg&.count&.positive?
-      end
     end
 
     private

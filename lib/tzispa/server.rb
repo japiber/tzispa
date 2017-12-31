@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rack'
-require 'tzispa/environment'
+require 'tzispa_config'
 
 module Tzispa
   # provides rack-based web server interface
@@ -21,7 +21,7 @@ module Tzispa
     private
 
     def setup
-      instance_eval 'load "./config/boot.rb"'
+      instance_eval 'load "./config/boot.rb"', __FILE__, __LINE__
       @app = if code_reloading?
                puts 'Tzispa is booting server with code reloading'
                Shotgun::Loader.new(rackup_file)

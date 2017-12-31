@@ -12,7 +12,7 @@ module Tzispa
     def initialize(name)
       @name = name
       @root = "#{Tzispa::Environment.instance.root}/#{Tzispa::Environment.instance.apps_path}"
-      instance_eval "module ::#{name.to_s.capitalize}; end"
+      instance_eval "module ::#{name.to_s.capitalize}; end", __FILE__, __LINE__
     end
 
     def setup
@@ -25,6 +25,10 @@ module Tzispa
 
     def path
       @path ||= root % name.to_s.downcase
+    end
+
+    def exist?(file)
+      File.exist? "#{path}/#{file}"
     end
 
     def require(file)

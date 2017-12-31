@@ -76,15 +76,29 @@ module Tzispa
     end
 
     def controller_class(mpath)
-      req_controller = mpath.pop
-      cf_module = if mpath.count > 1
-                    require "#{app.path}/controller/#{req_controller}"
-                    mpath.collect!(&:capitalize).join('::')
-                  else
-                    require "#{ctl_module.underscore}/#{req_controller}"
-                    ctl_module
-                  end
-      "#{cf_module}::#{req_controller.camelize}".constantize
+      name = mpath.pop
+      "#{require_controller(mpath, name)}::#{name.camelize}".constantize
+    end
+
+    def require_controller(mpath, name)
+      app_controller(mpath, name) || tz_controller(mpath, name)
+    end
+
+    def app_controller(mpath, name)
+      ac = "controller/#{mpath.join('/')}/#{name}"
+      return unless app.domain.exist? ac
+      app.domain.require ac
+      mpath.collect(&:capitalize).join('::')
+    end
+
+    def tz_controller(mpath, name)
+      if mpath.count.positive?
+        require "#{ctl_module.underscore}/#{mpath.join('/')}/#{name}"
+        [ctl_module, mpath.collect(&:capitalize).join('::')].join('::')
+      else
+        require "#{ctl_module.underscore}/#{name}"
+        ctl_module
+      end
     end
   end
 

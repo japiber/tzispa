@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require 'tzispa/environment'
+require 'tzispa_config'
 
 module Tzispa
   module Commands
 
     class Command
-
       NO_PROJECT_FOLDER = 'You must be located in a Tzispa project folder to run this command'
 
       def initialize(options)

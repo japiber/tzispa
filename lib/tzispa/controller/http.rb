@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 require 'tzispa_helpers'
 require 'tzispa/controller/base'
@@ -60,7 +62,6 @@ module Tzispa
           end
         end
       end
-
     end
 
   end

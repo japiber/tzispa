@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'tzispa/config/db_config'
+require 'tzispa/data/config'
 require 'tzispa/commands/helpers/repository'
 
 module Tzispa
@@ -19,7 +19,7 @@ module Tzispa
 
       def generate
         return unless generate_structure
-        Tzispa::Config::DbConfig.add_repository(name, adapter, database)
+        Tzispa::Data::Config.add_repository(name, adapter, database)
         return unless (db = Sequel.connect "#{adapter}://#{database}")
         tables = db.tables
         generate_models tables

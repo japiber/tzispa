@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'tzispa_helpers'
-require 'tzispa/environment'
+require 'tzispa_config'
 require 'tzispa/context'
 
 module Tzispa
@@ -28,11 +28,11 @@ module Tzispa
       private
 
       def invoke
-        catch(:halt) {
+        catch(:halt) do
           do_before
           send callmethod
           do_after
-        }
+        end
       end
 
     end
