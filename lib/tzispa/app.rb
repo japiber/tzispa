@@ -4,7 +4,7 @@ require 'forwardable'
 require 'logger'
 require 'i18n'
 require 'tzispa/domain'
-require 'tzispa/config/app_config'
+require 'tzispa/app_config'
 require 'tzispa/engine'
 require 'tzispa_data'
 
@@ -90,7 +90,7 @@ module Tzispa
     end
 
     def config
-      @config ||= Config::AppConfig.new(@domain).load!
+      @config ||= AppConfig.new(@domain).load!
     end
 
     private
